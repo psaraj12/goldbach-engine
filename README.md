@@ -4,9 +4,9 @@ Verification of the even Goldbach conjecture with **cached partitions** (QHot):
 a sieve-free verifier that keeps a small ring of recently successful large primes
 *q* and certifies up to 64 consecutive even numbers per 64-bit operation.
 
-**Result.** Every even integer in [4·10^18, 4.002·10^18] is a sum of two primes
-(10^15 numbers, zero exceptions). Together with Oliveira e Silva, Herzog and
-Pardi (Math. Comp. 83, 2014), the even Goldbach conjecture holds up to 4.002·10^18.
+**Result.** Every even integer in [4·10^18, 4.003·10^18] is a sum of two primes
+(1.5·10^15 numbers, zero exceptions). Together with Oliveira e Silva, Herzog and
+Pardi (Math. Comp. 83, 2014), the even Goldbach conjecture holds up to 4.003·10^18.
 The range [4·10^18, 4.001·10^18] was verified twice, by two different programs
 (v4 and v5), and its first 1.595·10^14 numbers a third time (v6); all v5 and v6
 minimal-partition witnesses agree.
@@ -18,12 +18,12 @@ minimal-partition witnesses agree.
 
 | Path | What it is |
 | --- | --- |
-| `src/goldbach_v6_2.cpp` | **v6.2, the current verifier**: v6.1 plus words carried between batches in the prefix (AVX-512, AVX2 and NEON; halves the prefix's loads); K=56 with AVX-512 |
+| `src/goldbach_v6_2.cpp` | **v6.2, the current verifier**: v6.1 plus words carried between batches in the prefix (AVX-512 and AVX2; halves the prefix's loads); K=56 with AVX-512 or NEON. Produced the 4.002→4.003·10^18 run |
 | `src/goldbach_v6_1.cpp` | v6.1: batched QHot, sorted ring, fixed prefix (K=40 with AVX-512, else 32), optional AVX-512 / AVX2 / NEON prefix, fully-covered-batch shortcut |
 | `src/goldbach_v6_1_portable.cpp` | v6.1 with the vector prefix chosen at run time (portable binaries; carried words need per-thread state and are not in the portable build) |
-| `src/goldbach_v6_simd.cpp` | v6 (K=32 default, no shortcut): the build used for the independent recomputation and the 4.001→4.002·10^18 run |
+| `src/goldbach_v6_simd.cpp` | v6 (K=32 default, no shortcut): the build used for the independent recomputation and, with K=40, the 4.001→4.002·10^18 run |
 | `src/goldbach_v5_batch.cpp` | v5, the build that produced the 4·10^18 → 4.001·10^18 campaign |
-| `src/goldbach_v4.cpp` | v4, per-number QHot (reference implementation for equivalence tests) |
+| `src/goldbach_v4.cpp` | v4, per-number QHot: the program generation of the first verification of 4·10^18 → 4.001·10^18 (exact build: see `docs/PROVENANCE.md`), and the reference implementation for equivalence tests |
 | `baselines/goldbach_v4_window.cpp` | double-sieve-style baseline (primesieve window + shift-OR), untuned |
 | `experiments/` | measured variants kept for the record (see `experiments/README.md`) |
 | `scripts/` | build, certificate and witness verification, run comparison |
@@ -130,6 +130,7 @@ Claude (Anthropic); code reviews by ChatGPT (OpenAI) suggested the fully-covered
 shortcut (v6.1) and the reuse of prefix addressing between batches, developed into
 carried words (v6.2). The fixed-length prefix follows the tuned inner loop of
 Oliveira e Silva, Herzog and Pardi (2014).
+
 ## Citation
 
 See `CITATION.cff`. Please cite the paper and the Zenodo archive.
