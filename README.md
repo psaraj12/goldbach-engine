@@ -37,7 +37,7 @@ which takes a few seconds to a minute depending on your machine:
 
 ```bash
 mkdir -p run && cd run
-../build/goldbach_v6 4000000000000000000 4000000199999999998 24 $(nproc) 40000000 1000 512
+../build/goldbach_v6 4000000000000000000 4000000199999999998 24 $(getconf _NPROCESSORS_ONLN) 40000000 1000 512
 ```
 
 The arguments are: start, end (even numbers, inclusive), block bits (24),
@@ -58,7 +58,7 @@ COLD witness is the smallest possible p.
 interrupted, continue it from the same folder with:
 
 ```bash
-../build/goldbach_v6 --resume 0 0 24 $(nproc) 40000000 1000 512
+../build/goldbach_v6 --resume 0 0 24 $(getconf _NPROCESSORS_ONLN) 40000000 1000 512
 ```
 
 **macOS (Apple Silicon):** install GCC and SymPy, then build with the macOS
@@ -66,7 +66,8 @@ script (profile-guided optimization and all checks, as on Linux), and run as in 
 
 ```bash
 brew install gcc
-pip3 install --user sympy
+python3 -m venv .venv && source .venv/bin/activate
+pip install sympy
 bash scripts/build_v6_mac.sh
 ```
 
@@ -127,12 +128,12 @@ goldbach_v6 --resume 0 0 BLOCK_BITS THREADS ANCHOR_LIMIT SAMPLE_LIMIT RING
 - `START`, `END`: even integers, inclusive range.
 - Recommended settings: `BLOCK_BITS=24`, `ANCHOR_LIMIT=40000000`, `RING=512` (power of two),
   `SAMPLE_LIMIT=250000` (total witness rows kept for the whole run).
-- `THREADS`: use all hardware threads (`$(nproc)`).
+- `THREADS`: use all hardware threads (`$(getconf _NPROCESSORS_ONLN)`).
 
 Example: re-verify 10^11 even numbers just above 4·10^18
 
 ```bash
-./goldbach_v6 4000000000000000000 4000000199999999998 24 $(nproc) 40000000 1000 512
+./goldbach_v6 4000000000000000000 4000000199999999998 24 $(getconf _NPROCESSORS_ONLN) 40000000 1000 512
 ```
 
 The program writes an atomic checkpoint after every 10^11 even numbers, with
@@ -153,12 +154,12 @@ python3 scripts/compare_witnesses.py reference_checkpoint.csv rerun_checkpoint.c
 # full certificate dump for a small range (debug build), checked row by row
 g++ -O3 -march=native -fopenmp -std=c++17 -DDUMP_ALL src/goldbach_v6_2.cpp -o goldbach_v6_dump
 S=4000000000000000000; E=$((S + 2*1048576 - 2))
-./goldbach_v6_dump $S $E 24 $(nproc) 40000000 1000 512 > /dev/null
+./goldbach_v6_dump $S $E 24 $(getconf _NPROCESSORS_ONLN) 40000000 1000 512 > /dev/null
 python3 scripts/verify_dump_parallel.py goldbach_v62_dump.csv $S $E 40000000
 
 # bit-exact check of a vector prefix against the scalar computation
 g++ -O3 -march=native -fopenmp -std=c++17 -DSIMD_AVX512 -DSIMD_CHECK src/goldbach_v6_2.cpp -o check
-./check $S $((S + 2*33554432 - 2)) 24 $(nproc) 40000000 1000 512 | grep "SIMD checks"
+./check $S $((S + 2*33554432 - 2)) 24 $(getconf _NPROCESSORS_ONLN) 40000000 1000 512 | grep "SIMD checks"
 ```
 
 ## Method in one paragraph

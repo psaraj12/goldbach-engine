@@ -19,7 +19,7 @@ if [ -z "$CXX" ]; then
 fi
 [ -n "$CXX" ] || { echo "No Homebrew GCC found (g++-NN). Install it with: brew install gcc"; exit 1; }
 "$CXX" --version 2>/dev/null | head -1 | grep -qi clang && { echo "$CXX is Apple clang, not GCC. Install GCC with: brew install gcc"; exit 1; }
-python3 -c "import sympy" 2>/dev/null || { echo "SymPy missing. Install it with: pip3 install --user sympy"; exit 1; }
+python3 -c "import sympy" 2>/dev/null || { echo "SymPy missing. Create a virtual environment and install it:"; echo "  python3 -m venv .venv && source .venv/bin/activate && pip install sympy"; exit 1; }
 T=$(sysctl -n hw.ncpu 2>/dev/null || nproc)
 if command -v shasum > /dev/null 2>&1; then SHA="shasum -a 256"; else SHA="sha256sum"; fi
 CPU=$(sysctl -n machdep.cpu.brand_string 2>/dev/null || grep -m1 "model name" /proc/cpuinfo | cut -d: -f2)
