@@ -111,18 +111,24 @@ small primes (the anchors, up to 4·10^7) tells which of the 64 numbers q certif
 Slices from the ring of cached q are OR-ed until the batch is covered; numbers left
 over are handled by an ascending scan over the anchors with deterministic
 Miller–Rabin, and any new q found there joins the ring. Fewer than 1 in 100,000
-numbers reach that path. The first 56 probes with AVX-512 (32 otherwise) are a fixed,
-unrolled, optionally vectorized prefix, following the per-processor tuned inner
-loop of Oliveira e Silva et al. (Algorithm 1.4), and batches fully covered by the
-ring skip the per-number loop entirely. With a vector prefix, each entry's second bitset
-word is kept for the next batch, where it is the first word needed, halving the
-loads.
+numbers reach that path. The first 56 probes (with AVX-512 or NEON; 32 otherwise)
+are a fixed, unrolled, optionally vectorized prefix, following the per-processor
+tuned inner loop of Oliveira e Silva et al. (Algorithm 1.4), and batches fully
+covered by the ring skip the per-number loop entirely. With AVX-512 or AVX2, each
+entry's second bitset word is kept for the next batch, where it is the first word
+needed, halving the prefix's loads.
 
 ## Acknowledgments
 
 The fully-covered-batch shortcut (v6.1) and the reuse of prefix addressing between
+<<<<<<< HEAD
 batches, developed into carried words (v6.2), were suggested in code reviews by ChatGPT. The fixed-length prefix follows the tuned inner loop of Oliveira e Silva,
 Herzog and Pardi (2014).
+=======
+batches, developed into carried words (v6.2), were suggested in code reviews by
+ChatGPT. The code was developed with Claude. The fixed-length prefix follows the
+tuned inner loop of Oliveira e Silva, Herzog and Pardi (2014).
+>>>>>>> 2b9a58f (README: update method paragraph and acknowledgments)
 
 ## Citation
 
