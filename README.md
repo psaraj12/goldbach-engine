@@ -64,7 +64,7 @@ interrupted, continue it from the same folder with:
 **macOS (Apple Silicon):** install GCC and SymPy, then build with the macOS
 script (profile-guided optimization and all checks, as on Linux), and run as in step 2:
 
-````bash
+```bash
 brew install gcc
 pip3 install --user sympy
 bash scripts/build_v6_mac.sh
