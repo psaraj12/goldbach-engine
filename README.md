@@ -121,8 +121,7 @@ loads.
 ## Acknowledgments
 
 The fully-covered-batch shortcut (v6.1) and the reuse of prefix addressing between
-batches, developed into carried words (v6.2), were suggested in external code
-reviews. The fixed-length prefix follows the tuned inner loop of Oliveira e Silva,
+batches, developed into carried words (v6.2), were suggested in code reviews by ChatGPT. The fixed-length prefix follows the tuned inner loop of Oliveira e Silva,
 Herzog and Pardi (2014).
 
 ## Citation
