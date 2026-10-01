@@ -1,0 +1,10 @@
+build/
+*.o
+*.gcda
+*.gcno
+*_dump.csv
+*_checkpoint.csv
+*_misses.csv
+*.log
+/sweep*/
+/runs*/
