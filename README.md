@@ -61,11 +61,13 @@ interrupted, continue it from the same folder with:
 ../build/goldbach_v6 --resume 0 0 24 $(nproc) 40000000 1000 512
 ```
 
-**macOS (Apple Silicon):** install GCC with Homebrew (`brew install gcc`), then
-build with the `g++-NN` version it installed, and run as in step 2:
+**macOS (Apple Silicon):** install GCC and SymPy, then build with the macOS
+script (profile-guided optimization and all checks, as on Linux), and run as in step 2:
 
-```bash
-g++-15 -O3 -mcpu=native -fopenmp -std=c++17 -DSIMD_NEON src/goldbach_v6_2.cpp -o build/goldbach_v6
+````bash
+brew install gcc
+pip3 install --user sympy
+bash scripts/build_v6_mac.sh
 ```
 
 ## Contents
