@@ -14,11 +14,66 @@ minimal-partition witnesses agree.
 - Paper: *to be added*
 - Data archive (checkpoints, logs, provenance): Zenodo, doi:10.5281/zenodo.*to be assigned*
 
+## Quick start
+
+You need Linux (or WSL on Windows) with GCC 11 or newer and Python 3 with SymPy.
+On macOS, see the note at the end of this section.
+
+**1. Get the code and build it** (about 5 minutes; runs all correctness checks):
+
+```bash
+sudo apt install -y git g++ python3-sympy
+git clone https://github.com/psaraj12/goldbach-engine.git
+cd goldbach-engine
+bash scripts/build_v6.sh
+```
+
+The script picks the best vector instructions for your CPU (AVX-512, AVX2 or
+scalar), builds an optimized binary at `build/goldbach_v6`, and stops with a
+message if any check fails.
+
+**2. Verify a range.** This checks 10^11 even numbers just above 4·10^18,
+which takes a few seconds to a minute depending on your machine:
+
+```bash
+mkdir -p run && cd run
+../build/goldbach_v6 4000000000000000000 4000000199999999998 24 $(nproc) 40000000 1000 512
+```
+
+The arguments are: start, end (even numbers, inclusive), block bits (24),
+threads, anchor limit (4·10^7), number of witness samples to keep, and ring
+size (512). Use the settings shown; only start, end and threads normally change.
+At the end you should see `Coverage: N / N` and `Misses: 0`.
+
+**3. Check the result independently:**
+
+```bash
+python3 ../scripts/verify_witnesses.py goldbach_v62_checkpoint.csv --minimal
+```
+
+This re-checks every recorded witness N = p + q with SymPy, and that each
+COLD witness is the smallest possible p.
+
+**Long runs** write a checkpoint every 10^11 even numbers. If a run is
+interrupted, continue it from the same folder with:
+
+```bash
+../build/goldbach_v6 --resume 0 0 24 $(nproc) 40000000 1000 512
+```
+
+**macOS (Apple Silicon):** install GCC with Homebrew (`brew install gcc`), then
+build with the `g++-NN` version it installed, and run as in step 2:
+
+```bash
+g++-15 -O3 -mcpu=native -fopenmp -std=c++17 -DSIMD_NEON src/goldbach_v6_2.cpp -o build/goldbach_v6
+```
+
 ## Contents
 
 | Path | What it is |
 | --- | --- |
 | `src/goldbach_v6_2.cpp` | **v6.2, the current verifier**: v6.1 plus words carried between batches in the prefix (AVX-512 and AVX2; halves the prefix's loads); K=56 with AVX-512 or NEON. Produced the 4.002→4.003·10^18 run |
+| `src/archive/goldbach_v6_2_11525e8d.cpp` | the exact v6.2 revision that produced the 4.002→4.003·10^18 run (same AVX-512 code as the current file; rebuilds the campaign binary bit-identically) |
 | `src/goldbach_v6_1.cpp` | v6.1: batched QHot, sorted ring, fixed prefix (K=40 with AVX-512, else 32), optional AVX-512 / AVX2 / NEON prefix, fully-covered-batch shortcut |
 | `src/goldbach_v6_1_portable.cpp` | v6.1 with the vector prefix chosen at run time (portable binaries; carried words need per-thread state and are not in the portable build) |
 | `src/goldbach_v6_simd.cpp` | v6 (K=32 default, no shortcut): the build used for the independent recomputation and, with K=40, the 4.001→4.002·10^18 run |
