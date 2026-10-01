@@ -11,8 +11,9 @@ The range [4·10^18, 4.001·10^18] was verified twice, by two different programs
 (v4 and v5), and its first 1.595·10^14 numbers a third time (v6); all v5 and v6
 minimal-partition witnesses agree.
 
-- Paper: *to be added*
-- Data archive (checkpoints, logs, provenance): Zenodo, doi:10.5281/zenodo.*to be assigned*
+The method was first described in: S. A. R. Parthibanathan, *Q-Hot Cache: A High-Throughput
+Method for Empirical Verification of the Even Goldbach Conjecture*, Zenodo preprint, April 2026,
+[doi:10.5281/zenodo.19884541](https://doi.org/10.5281/zenodo.19884541).
 
 ## Quick start
 
@@ -179,7 +180,8 @@ needed, halving the prefix's loads.
 
 ## Author
 
-Santhiagu. Idea, design decisions, computations and verification.
+Santhiagu Antony Raj Parthibanathan ([ORCID 0009-0002-0355-4191](https://orcid.org/0009-0002-0355-4191)).
+Idea, design decisions, computations and verification.
 
 ## Acknowledgments
 

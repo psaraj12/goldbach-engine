@@ -2,9 +2,14 @@ cff-version: 1.2.0
 message: "If you use this software or its data, please cite it as below."
 title: "goldbach-engine: verifying the even Goldbach conjecture with cached partitions"
 authors:
-  - name: "Santhiagu"
+    - family-names: "Parthibanathan"
+      given-names: "Santhiagu Antony Raj"
+      orcid: "https://orcid.org/0009-0002-0355-4191"
 version: "6.2.0"
 date-released: "2026-10-01"
 license: MIT
 repository-code: "https://github.com/psaraj12/goldbach-engine"
-
+identifiers:
+  - type: doi
+    value: "10.5281/zenodo.19884541"
+    description: "Preprint in which the Q-Hot cache method was first described (Zenodo, April 2026)"
