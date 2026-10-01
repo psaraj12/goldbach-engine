@@ -121,14 +121,9 @@ needed, halving the prefix's loads.
 ## Acknowledgments
 
 The fully-covered-batch shortcut (v6.1) and the reuse of prefix addressing between
-<<<<<<< HEAD
-batches, developed into carried words (v6.2), were suggested in code reviews by ChatGPT. The fixed-length prefix follows the tuned inner loop of Oliveira e Silva,
-Herzog and Pardi (2014).
-=======
 batches, developed into carried words (v6.2), were suggested in code reviews by
 ChatGPT. The code was developed with Claude. The fixed-length prefix follows the
 tuned inner loop of Oliveira e Silva, Herzog and Pardi (2014).
->>>>>>> 2b9a58f (README: update method paragraph and acknowledgments)
 
 ## Citation
 
