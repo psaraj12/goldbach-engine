@@ -15,6 +15,9 @@ The method was first described in: S. A. R. Parthibanathan, *Q-Hot Cache: A High
 Method for Empirical Verification of the Even Goldbach Conjecture*, Zenodo preprint, April 2026,
 [doi:10.5281/zenodo.19884541](https://doi.org/10.5281/zenodo.19884541).
 
+Data (checkpoints, logs, provenance for every run): Zenodo,
+[doi:10.5281/zenodo.23082138](https://doi.org/10.5281/zenodo.23082138).
+
 ## Quick start
 
 You need Linux (or WSL on Windows) with GCC 11 or newer and Python 3 with SymPy.
@@ -193,7 +196,7 @@ Oliveira e Silva, Herzog and Pardi (2014).
 
 ## Citation
 
-See `CITATION.cff`. Please cite the paper and the Zenodo archive.
+See `CITATION.cff`. Please cite the paper and the Zenodo data record (doi:10.5281/zenodo.23082138).
 
 ## License
 

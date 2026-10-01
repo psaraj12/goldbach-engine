@@ -13,3 +13,6 @@ identifiers:
   - type: doi
     value: "10.5281/zenodo.19884541"
     description: "Preprint in which the Q-Hot cache method was first described (Zenodo, April 2026)"
+  - type: doi
+    value: "10.5281/zenodo.23082138"
+    description: "Verification data: checkpoints, logs and provenance for every run (Zenodo, version 2)"
