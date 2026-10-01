@@ -119,13 +119,17 @@ covered by the ring skip the per-number loop entirely. With AVX-512 or AVX2, eac
 entry's second bitset word is kept for the next batch, where it is the first word
 needed, halving the prefix's loads.
 
+## Author
+
+Santhiagu. Idea, design decisions, computations and verification.
+
 ## Acknowledgments
 
-The fully-covered-batch shortcut (v6.1) and the reuse of prefix addressing between
-batches, developed into carried words (v6.2), were suggested in code reviews by
-ChatGPT. The code was developed with Claude. The fixed-length prefix follows the
-tuned inner loop of Oliveira e Silva, Herzog and Pardi (2014).
-
+Implementation, benchmarking and checking were carried out with the assistance of
+Claude (Anthropic); code reviews by ChatGPT (OpenAI) suggested the fully-covered-batch
+shortcut (v6.1) and the reuse of prefix addressing between batches, developed into
+carried words (v6.2). The fixed-length prefix follows the tuned inner loop of
+Oliveira e Silva, Herzog and Pardi (2014).
 ## Citation
 
 See `CITATION.cff`. Please cite the paper and the Zenodo archive.
