@@ -2,7 +2,7 @@
 # Build and check a native v6.2 binary on this machine (Linux, GCC >= 11, python3-sympy).
 #   - picks the vector prefix: AVX-512 > AVX2 > NEON (ARM64) > scalar
 #   - picks the prefix length K for that prefix (override with KFIX=n)
-#       AVX-512: 56 (measured best on EPYC 9J14 with carried words); others: 32
+#       AVX-512 and NEON: 56 (EPYC 9J14, Apple M4); AVX2 and scalar: 32
 #   - trains a PGO profile at exactly the campaign settings
 #   - runs the bit-exact prefix check, the forced-miss check and a certificate dump
 #   - writes build/provenance_v6.txt (settings, source, binary and profile SHA-256)
@@ -11,7 +11,7 @@ set -e
 SRC=${1:-src/goldbach_v6_2.cpp}
 BB=24; P=40000000; RING=512; TR=200000000; S=4000000000000000000; T=$(nproc)
 if [ "$(uname -m)" = aarch64 ]; then
-  F="-O3 -mcpu=native -fopenmp -std=c++17"; ISA=-DSIMD_NEON; KDEF=32
+  F="-O3 -mcpu=native -fopenmp -std=c++17"; ISA=-DSIMD_NEON; KDEF=56
 else
   F="-O3 -march=native -fopenmp -std=c++17"
   if   grep -qw avx512f /proc/cpuinfo; then ISA=-DSIMD_AVX512; KDEF=56

@@ -1,10 +1,10 @@
 // goldbach_v6_2.cpp -- v6.2: v6.1 plus words carried between consecutive batches in the
-// prefix. On by default for AVX-512, AVX2 and NEON (-DNO_CARRY disables); available for the
-// scalar prefix with -DCARRY. Tagged [CARRY].
+// prefix. On by default for AVX-512 and AVX2 (-DNO_CARRY disables); available for NEON and
+// the scalar prefix with -DCARRY. Tagged [CARRY].
 // Carrying halves the gathers of the prefix: when a batch advances by 128, each prefix
 // entry's low word is the previous batch's high word, provided the ring is unchanged.
 // Based on goldbach_v6_1.cpp -- v6.1: v6 plus the fully-covered-batch shortcut (always on, except
-// in -DDUMP_ALL builds). KFIX defaults to 56 with -DSIMD_AVX512 (v6.2), else 32.
+// in -DDUMP_ALL builds). KFIX defaults to 56 with -DSIMD_AVX512 or -DSIMD_NEON (v6.2), else 32.
 // Vector prefix: -DSIMD_AVX512 | -DSIMD_AVX2 | -DSIMD_NEON | none (scalar).
 //
 // goldbach_v6_simd.cpp -- EXPERIMENT: KFIX prefix (default 32) with optional
@@ -195,14 +195,16 @@
 static std::atomic<unsigned long long> simd_checks{0};
 #endif
 #if !defined(DUMP_ALL) && !defined(KACC4) && !defined(NO_CARRY) && !defined(CARRY) && \
-    (defined(SIMD_AVX512) || defined(SIMD_AVX2) || defined(SIMD_NEON))
-#define CARRY 1   // [CARRY] on by default for vector prefixes (-DNO_CARRY disables; -DCARRY
-#endif            // forces it for the scalar prefix, where it measured slower on x86)
+    (defined(SIMD_AVX512) || defined(SIMD_AVX2))
+#define CARRY 1   // [CARRY] on by default for AVX-512 and AVX2 (-DNO_CARRY disables).
+                  // NEON and scalar: off by default (-DCARRY enables); measured neutral
+                  // on Apple M4 at K=56 and slower for the scalar prefix on x86.
+#endif
 #ifndef KFIX
-#if defined(SIMD_AVX512) || defined(V61_PORTABLE)
-#define KFIX 56   // measured best with the AVX-512 prefix and carried words (EPYC 9J14)
+#if defined(SIMD_AVX512) || defined(SIMD_NEON) || defined(V61_PORTABLE)
+#define KFIX 56   // measured best: AVX-512 with carried words (EPYC 9J14), NEON (Apple M4)
 #else
-#define KFIX 32   // measured best for scalar / AVX2 / NEON
+#define KFIX 32   // scalar and AVX2 (AVX2 not yet re-swept after carried words)
 #endif
 #endif
 #include <atomic>
