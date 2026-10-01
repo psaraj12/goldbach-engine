@@ -4,11 +4,12 @@ Verification of the even Goldbach conjecture with **cached partitions** (QHot):
 a sieve-free verifier that keeps a small ring of recently successful large primes
 *q* and certifies up to 64 consecutive even numbers per 64-bit operation.
 
-**Result.** Every even integer in [4·10^18, 4.001·10^18] is a sum of two primes
-(5·10^14 numbers, zero exceptions). Together with Oliveira e Silva, Herzog and
-Pardi (Math. Comp. 83, 2014), the even Goldbach conjecture holds up to 4.001·10^18.
-The whole range was recomputed independently with a second build and different
-parameters; all minimal-partition witnesses agree.
+**Result.** Every even integer in [4·10^18, 4.002·10^18] is a sum of two primes
+(10^15 numbers, zero exceptions). Together with Oliveira e Silva, Herzog and
+Pardi (Math. Comp. 83, 2014), the even Goldbach conjecture holds up to 4.002·10^18.
+The range [4·10^18, 4.001·10^18] was verified twice, by two different programs
+(v4 and v5), and its first 1.595·10^14 numbers a third time (v6); all v5 and v6
+minimal-partition witnesses agree.
 
 - Paper: *to be added*
 - Data archive (checkpoints, logs, provenance): Zenodo, doi:10.5281/zenodo.*to be assigned*
