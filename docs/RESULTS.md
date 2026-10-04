@@ -54,7 +54,7 @@ prefilter ahead of Miller–Rabin. It ran as three invocations that join end to 
 Each invocation starts on the last number of the one before, so the campaign covers
 every even integer in [4·10^18, 4.001·10^18], both ends included. In every
 checkpoint header, `total_verified` equals the number of even integers in its range.
-Only the checkpoints survive, with no logs or build records. See
+It ran on an OCI E5.Flex VM with 12 OCPUs (AMD EPYC 9J14), according to the author's records. Only the checkpoints survive, with no logs or build records. See
 [`PROVENANCE.md`](PROVENANCE.md) for what this means for the final stretch of
 invocation 3.
 

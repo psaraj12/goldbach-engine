@@ -7,7 +7,7 @@ lists the SHA-256 of every file in the Zenodo data record
 ([doi:10.5281/zenodo.23082138](https://doi.org/10.5281/zenodo.23082138)):
 checkpoints, miss files, logs and provenance records.
 
-Runs 2–7 were made on Oracle Cloud VM.Standard.E5.Flex instances (AMD EPYC 9J14). Campaign 1 (run 1) has checkpoints only; see the notes.
+All runs were made on Oracle Cloud VM.Standard.E5.Flex instances (AMD EPYC 9J14). For campaign 1 (run 1) the VM shape comes from the author's records, because only its checkpoints survive; see the notes.
 
 ## Sources
 
@@ -24,7 +24,7 @@ Each repository file above is byte-identical to the copy archived with its run.
 
 | # | Run | Range (even N, inclusive) | Build | Binary SHA-256 | PGO profile SHA-256 | VM |
 | --- | --- | --- | --- | --- | --- | --- |
-| 1 | campaign 1 | 4·10^18 → 4.001·10^18 (both ends included) | not recorded | not recorded | n/a | not recorded |
+| 1 | campaign 1 | 4·10^18 → 4.001·10^18 (both ends included) | not recorded | not recorded | n/a | 12 OCPUs (author's records) |
 | 2 | v5 campaign, segment 1 | 4·10^18 → 4,000,318,999,999,999,998 | GCC 13.3.0, `-O3 -march=native -fopenmp`, no PGO | `8187c1c7d0486da02e6e48adc398cb69c9bcb4065cd8a68c4cbb38b5c1a05097` | n/a | 12 OCPUs, 24 threads |
 | 2 | v5 campaign, segment 2 | 4,000,319,000,000,000,000 → 4.001·10^18 − 2 | same binary as segment 1 | `8187c1c7…5097` | n/a | 12 OCPUs, 24 threads |
 | 3 | v6 recomputation of segment 1 | 4·10^18 → 4,000,318,999,999,999,998 | `-DSIMD_AVX512`, K=32, PGO | `7d8f4ec3700effb6f6e8a2606028c85c82336077aee325566ba33c7d7c481efe` | `cc3890f2dfaf08b5d11fa7a985b6e10869e357f49844625d6c1ac5e543c592d7` | 24 OCPUs, 48 threads |
@@ -57,8 +57,8 @@ block bits 24, anchor limit 4·10^7 and ring 512.
   archived with the data.
 - **Run 7.** This run used the run 5 campaign binary (`bfea4378…a370`), whose
   reproduction from the archived v6.2 source is described under run 5.
-- **Campaign 1.** Only checkpoints survive: 13 files, with no log, build record or
-  hardware record. The headers show three invocations that join end to end, each
+- **Campaign 1.** Only checkpoints survive: 13 files, with no log or build record.
+  The author's records give the VM as OCI E5.Flex with 12 OCPUs. The headers show three invocations that join end to end, each
   starting on the last number verified by the one before:
   [4·10^18, 4,000,037,279,999,999,998], then up to 4,000,121,119,999,999,996, then
   up to 4.001·10^18 (resumed several times, with a checkpoint saved at each stop).
