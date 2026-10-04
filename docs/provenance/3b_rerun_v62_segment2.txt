@@ -1,0 +1,7 @@
+run: v6.2 recomputation of v5 segment 2
+range: 4000319000000000000 .. 4000999999999999998, bb=24, P=40000000, ring=512, sample_limit=250000
+binary = the 4.002e18 extension binary (see campaign_v62a/provenance_campaign_v62a.txt)
+Thu Oct  1 13:24:44 UTC 2026
+Model name:                              AMD EPYC 9J14 96-Core Processor
+threads=48
+bfea4378691c270f0d12e1a4d65b1f1d059c74ce370ee0e7da723bc2b017a370  /home/ubuntu/goldbach-engine/build/goldbach_v6

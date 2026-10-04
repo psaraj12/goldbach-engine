@@ -28,17 +28,17 @@ Miller–Rabin used to prove N − p prime.
 
 | Range | Even integers | Primary run | Independent rerun | Exceptions |
 | --- | --- | --- | --- | --- |
-| [4.000, 4.001]·10^18 | 5.0·10^14 | v5 | campaign 1 (v4 generation); v6 for the first 1.595·10^14 | 0 |
+| [4.000, 4.001]·10^18 | 5.0·10^14 | v5 | v6 and v6.2 (and earlier, campaign 1) | 0 |
 | [4.001, 4.002]·10^18 | 5.0·10^14 | v6 (AVX-512, K=40) | v5 | 0 |
 | [4.002, 4.003]·10^18 | 5.0·10^14 | v6.2 (AVX-512, K=56) | v5 | 0 |
 
-Every part of the range has been verified by at least two different programs.
-The minimal-partition (COLD) witnesses of overlapping runs were compared: all
-231,900 are identical. All 1,063,800
-recorded witnesses pass an independent SymPy check. For per-run hardware, timing
-and hit rates, see [`docs/RESULTS.md`](docs/RESULTS.md). For checksums that tie
-each result to its exact source, binary and PGO profile, see
-[`docs/PROVENANCE.md`](docs/PROVENANCE.md).
+Every part of the range has been verified by two different programs, and each run
+has its source, binary, log and checkpoint on record. The minimal-partition (COLD)
+witnesses of each pair of overlapping runs were compared: all 300,000 are
+identical. All 1,200,000 recorded witnesses from these runs pass an independent
+SymPy check. For per-run hardware, timing and hit rates, see
+[`docs/RESULTS.md`](docs/RESULTS.md). For checksums that tie each result to its
+exact source, binary and PGO profile, see [`docs/PROVENANCE.md`](docs/PROVENANCE.md).
 
 ## Why the result is a proof for the range
 
