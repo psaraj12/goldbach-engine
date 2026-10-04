@@ -10,7 +10,7 @@ match the folders of the Zenodo data record and [`PROVENANCE.md`](PROVENANCE.md)
 
 | Range | Primary run | Independent rerun | Also verified by | COLD witnesses compared | Identical |
 | --- | --- | --- | --- | --- | --- |
-| [4.000, 4.001)·10^18 | 2: v5 | 3: v6 (segment 1) and 3b: v6.2 (segment 2) | 1: campaign 1 | 100,000 | all |
+| [4.000, 4.001)·10^18 | 2: v5 | 3: v6 (segment 1) and 7: v6.2 (segment 2) | 1: campaign 1 | 100,000 | all |
 | [4.001, 4.002)·10^18 | 4: v6, K=40 | 6: v5 | | 100,000 | all |
 | [4.002, 4.003)·10^18 | 5: v6.2, K=56 | 6: v5 | | 100,000 | all |
 
@@ -20,7 +20,7 @@ QHOT rows coincide, because the two programs use different rings.
 
 ## Runs
 
-| | 2: v5 seg. 1 | 2: v5 seg. 2 | 3: v6 rerun seg. 1 | 3b: v6.2 rerun seg. 2 | 4: v6 ext. | 5: v6.2 ext. | 6: v5 rerun ext. |
+| | 2: v5 seg. 1 | 2: v5 seg. 2 | 3: v6 rerun seg. 1 | 7: v6.2 rerun seg. 2 | 4: v6 ext. | 5: v6.2 ext. | 6: v5 rerun ext. |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | First N | 4,000,000,000,000,000,000 | 4,000,319,000,000,000,000 | 4,000,000,000,000,000,000 | 4,000,319,000,000,000,000 | 4,001,000,000,000,000,000 | 4,002,000,000,000,000,000 | 4,001,000,000,000,000,000 |
 | Last N | 4,000,318,999,999,999,998 | 4,000,999,999,999,999,998 | 4,000,318,999,999,999,998 | 4,000,999,999,999,999,998 | 4,001,999,999,999,999,998 | 4,002,999,999,999,999,998 | 4,002,999,999,999,999,998 |
@@ -34,7 +34,7 @@ QHOT rows coincide, because the two programs use different rings.
 | VM | 12 OCPUs | 12 OCPUs | 24 OCPUs | 24 OCPUs | 24 OCPUs | 24 OCPUs | 24 OCPUs |
 | Witness rows | 63,800 | 136,200 | 63,800 | 136,200 | 200,000 | 200,000 | 400,000 |
 
-All block bits are 24. Hardware for runs 2–6: OCI VM.Standard.E5.Flex, AMD EPYC
+All block bits are 24. Hardware for runs 2–7: OCI VM.Standard.E5.Flex, AMD EPYC
 9J14, two threads per OCPU. Run 4 was paused once for a benchmark and resumed with
 the same binary, and its wall time is the total of both parts. Segment 1 of run 2
 was stopped at 4,000,318,999,999,999,998, and segment 2 started at the next even
@@ -60,7 +60,7 @@ invocation 3.
 
 ## Witness checks
 
-Every witness row of runs 2–6 (1,200,000 rows) was re-checked with
+Every witness row of runs 2–7 (1,200,000 rows) was re-checked with
 `scripts/verify_witnesses.py --minimal` (SymPy 1.14). The checks were: N even,
 p + q = N, p and q prime, p within the anchor limit, N inside the verified range, and
 each COLD witness minimal. All rows passed. The largest COLD p is 2,237, well inside
