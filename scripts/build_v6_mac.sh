@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Build and check a native v6.2 binary on macOS (Apple Silicon, Homebrew GCC, python3 + SymPy).
+# Build and check a native v6 binary on macOS (Apple Silicon, Homebrew GCC, python3 + SymPy).
 #   - uses the NEON prefix with K=56 (measured best on Apple M4; carried words off by default)
 #   - trains a PGO profile at exactly the campaign settings (PGO gave +78-86% on the M4)
 #   - runs the bit-exact prefix check, the forced-miss check and a certificate dump
@@ -7,8 +7,14 @@
 # Usage (from the repository root, in bash): bash scripts/build_v6_mac.sh
 # Optional overrides: GB_CXX=g++-15 (compiler), KFIX=n (prefix length, a multiple of 4)
 set -e
-SRC=${1:-src/goldbach_v6_2.cpp}
-BB=24; P=40000000; RING=512; TR=200000000; S=4000000000000000000
+SRC=${1:-src/goldbach_v6_3.cpp}
+# Settings follow the source version: v6.3 uses anchor limit 2e7; earlier versions use 4e7.
+# The carried index (-DCARRYIDX) has no effect with NEON (measured on Apple M4), so it is
+# not used here. Overrides: GB_P=n, GB_EXTRA="flags".
+if grep -q 'PROG_VERSION = "goldbach_v6_3' "$SRC"; then PDEF=20000000; XDEF=""
+else PDEF=40000000; XDEF=""; fi
+P=${GB_P:-$PDEF}; X=${GB_EXTRA-$XDEF}
+BB=24; RING=512; TR=200000000; S=4000000000000000000
 
 # --- tools ---------------------------------------------------------------
 CXX=${GB_CXX:-}
@@ -31,18 +37,18 @@ K=${KFIX:-56}
 KF="-DKFIX=$K"
 
 mkdir -p build && cp "$SRC" build/v6.cpp && cp scripts/verify_dump.py build/ && cd build
-echo "== compiler: $CXX | prefix: ${ISA:-scalar}, K=$K | threads: $T"
-"$CXX" $F $ISA $KF v6.cpp -o goldbach_v6_plain
-"$CXX" $F $KF -DDUMP_ALL v6.cpp -o goldbach_v6_dump
+echo "== compiler: $CXX | prefix: ${ISA:-scalar}, K=$K | anchor limit $P | threads: $T"
+"$CXX" $F $ISA $KF $X v6.cpp -o goldbach_v6_plain
+"$CXX" $F $KF $X -DDUMP_ALL v6.cpp -o goldbach_v6_dump
 rm -f gs.o gs.gcda
-"$CXX" $F $ISA $KF -fprofile-generate -c v6.cpp -o gs.o && "$CXX" $F -fprofile-generate gs.o -o gs_gen
+"$CXX" $F $ISA $KF $X -fprofile-generate -c v6.cpp -o gs.o && "$CXX" $F -fprofile-generate gs.o -o gs_gen
 mkdir -p train && (cd train && rm -f *.csv; ../gs_gen $S $((S+TR-2)) $BB 1 $P 1000 $RING > /dev/null)
 [ -s gs.gcda ] || { echo "PGO profile missing (gs.gcda) - STOP"; exit 1; }
-"$CXX" $F $ISA $KF -fprofile-use -Wno-missing-profile -c v6.cpp -o gs.o && "$CXX" $F gs.o -o goldbach_v6
+"$CXX" $F $ISA $KF $X -fprofile-use -Wno-missing-profile -c v6.cpp -o gs.o && "$CXX" $F gs.o -o goldbach_v6
 
 if [ -n "$ISA" ]; then
   echo "== bit-exact check of the vector prefix (K=$K)"
-  "$CXX" $F $ISA $KF -DSIMD_CHECK v6.cpp -o goldbach_v6_check
+  "$CXX" $F $ISA $KF $X -DSIMD_CHECK v6.cpp -o goldbach_v6_check
   mkdir -p chk_simd && (cd chk_simd && rm -f *.csv
     out=$(../goldbach_v6_check $S $((S+2*16777216-2)) $BB $T $P 1000 $RING 2>&1 | grep -E "SIMD checks|MISMATCH" || true)
     echo "$out"; echo "$out" | grep -q "SIMD checks passed" || { echo "SIMD CHECK FAILED - STOP"; exit 1; })
@@ -61,12 +67,12 @@ else echo "MISS LISTS DIFFER OR EMPTY - STOP"; exit 1; fi
 echo "== certificate dump at campaign settings (2^20 evens)"
 mkdir -p chk_dump && cd chk_dump && rm -f *.csv
 ../goldbach_v6_dump $S $((S+2*1048576-2)) $BB $T $P 1000 $RING > /dev/null
-python3 ../verify_dump.py goldbach_v62_dump.csv $S $((S+2*1048576-2)) $P
-rm -f goldbach_v62_dump.csv; cd ..
+D=$(ls goldbach_v6*_dump.csv); python3 ../verify_dump.py $D $S $((S+2*1048576-2)) $P
+rm -f $D; cd ..
 
 { date -u; echo "CPU: $CPU"; echo "threads=$T"; "$CXX" --version | head -1
   echo "prefix: ${ISA:-scalar}; KFIX=$K; campaign settings: bb=$BB P=$P ring=$RING"
-  echo "compile flags: $F $ISA $KF (+ PGO)"
+  echo "compile flags: $F $ISA $KF${X:+ $X} (+ PGO)"
   echo "PGO training: 1 thread, [$S, $((S+TR-2))], bb=$BB P=$P ring=$RING"
   $SHA v6.cpp goldbach_v6 gs.gcda; } | tee provenance_v6.txt
 echo "== done: build/goldbach_v6"

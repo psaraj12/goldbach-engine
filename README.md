@@ -94,7 +94,7 @@ That takes a few seconds on a large server and under a minute on a recent laptop
 
 ```bash
 mkdir -p run && cd run
-../build/goldbach_v6 4000000000000000000 4000000199999999998 24 $(getconf _NPROCESSORS_ONLN) 40000000 1000 512
+../build/goldbach_v6 4000000000000000000 4000000199999999998 24 $(getconf _NPROCESSORS_ONLN) 20000000 1000 512
 ```
 
 At the end, you should see `Coverage: N / N` and `Misses: 0`.
@@ -102,7 +102,7 @@ At the end, you should see `Coverage: N / N` and `Misses: 0`.
 **3. Check the witnesses independently.**
 
 ```bash
-python3 ../scripts/verify_witnesses.py goldbach_v62_checkpoint.csv --minimal
+python3 ../scripts/verify_witnesses.py goldbach_v63_checkpoint.csv --minimal
 ```
 
 This re-checks every recorded witness N = p + q with SymPy. It also confirms that
@@ -120,7 +120,7 @@ goldbach_v6 --resume 0 0 BLOCK_BITS THREADS ANCHOR_LIMIT SAMPLE_LIMIT RING
 | `START`, `END` | even integers, inclusive | |
 | `BLOCK_BITS` | work-block size (log2) | `24` |
 | `THREADS` | worker threads | `$(getconf _NPROCESSORS_ONLN)` |
-| `ANCHOR_LIMIT` | largest small prime p | `40000000` |
+| `ANCHOR_LIMIT` | largest small prime p | `20000000` (v6.3; the campaigns used `40000000`) |
 | `SAMPLE_LIMIT` | cap on witness rows kept for the whole run | `1000` for tests, `250000` for campaigns |
 | `RING` | Q-Hot ring size (power of two) | `512` |
 
@@ -136,15 +136,19 @@ run, use `--resume` from the same folder. Run only one instance per folder.
 profile-guided optimization and runs all checks:
 
 ```bash
-bash scripts/build_v6.sh      # src/goldbach_v6_2.cpp -> build/goldbach_v6, build/provenance_v6.txt
+bash scripts/build_v6.sh      # src/goldbach_v6_3.cpp -> build/goldbach_v6, build/provenance_v6.txt
 ```
 
 **Manual build** (no PGO), with the vector prefix chosen explicitly:
 
 ```bash
-g++ -O3 -march=native -fopenmp -std=c++17 -DSIMD_AVX512 src/goldbach_v6_2.cpp -o goldbach_v6_2
+g++ -O3 -march=native -fopenmp -std=c++17 -DSIMD_AVX512 src/goldbach_v6_3.cpp -o goldbach_v6_3
 #   -DSIMD_AVX2 (x86 without AVX-512), -DSIMD_NEON (ARM64, use -mcpu=native), or none (scalar)
 ```
+
+Leave out `-DCARRYIDX` in a manual build. The carried index pays off only together with
+PGO: with PGO it adds about 5% on AVX2 and 3–13% on AVX-512, but without PGO it cost
+about 4% on AVX2. `scripts/build_v6.sh` enables it, because that script always uses PGO.
 
 **Portable binary.** This builds one file that runs on any x86-64 Linux machine
 from about 2013 on. It chooses AVX-512, AVX2 or scalar at start-up and is a few
@@ -168,20 +172,20 @@ bash scripts/build_v6_mac.sh
 
 ```bash
 # every witness in a checkpoint; COLD rows are also checked for minimality
-python3 scripts/verify_witnesses.py goldbach_v62_checkpoint.csv --minimal
+python3 scripts/verify_witnesses.py goldbach_v63_checkpoint.csv --minimal
 
 # COLD witnesses of two runs over the same range must be identical
 python3 scripts/compare_witnesses.py reference_checkpoint.csv rerun_checkpoint.csv
 
 # full certificate dump for a small range (debug build), checked row by row
-g++ -O3 -march=native -fopenmp -std=c++17 -DDUMP_ALL src/goldbach_v6_2.cpp -o goldbach_v6_dump
+g++ -O3 -march=native -fopenmp -std=c++17 -DDUMP_ALL src/goldbach_v6_3.cpp -o goldbach_v6_dump
 S=4000000000000000000; E=$((S + 2*1048576 - 2))
-./goldbach_v6_dump $S $E 24 $(getconf _NPROCESSORS_ONLN) 40000000 1000 512 > /dev/null
-python3 scripts/verify_dump_parallel.py goldbach_v62_dump.csv $S $E 40000000
+./goldbach_v6_dump $S $E 24 $(getconf _NPROCESSORS_ONLN) 20000000 1000 512 > /dev/null
+python3 scripts/verify_dump_parallel.py goldbach_v63_dump.csv $S $E 20000000
 
 # bit-exact check of the vector prefix against the scalar computation
-g++ -O3 -march=native -fopenmp -std=c++17 -DSIMD_AVX512 -DSIMD_CHECK src/goldbach_v6_2.cpp -o check
-./check $S $((S + 2*33554432 - 2)) 24 $(getconf _NPROCESSORS_ONLN) 40000000 1000 512 | grep "SIMD checks"
+g++ -O3 -march=native -fopenmp -std=c++17 -DSIMD_AVX512 -DCARRYIDX -DSIMD_CHECK src/goldbach_v6_3.cpp -o check
+./check $S $((S + 2*33554432 - 2)) 24 $(getconf _NPROCESSORS_ONLN) 20000000 1000 512 | grep "SIMD checks"
 ```
 
 ## Method in more detail
@@ -198,7 +202,10 @@ The first 56 probes (AVX-512 or NEON; 32 otherwise) form a fixed, unrolled,
 vectorized prefix. This follows the tuned inner loop of Oliveira e Silva et al.
 (Algorithm 1.4). With AVX-512 or AVX2, the second bitset word of each ring entry is
 carried over to the next batch, where it becomes the first word needed. This halves
-the prefix's memory loads.
+the prefix's memory loads. v6.3 also carries the gather index and shifts (with PGO),
+and drops work from the cold path that the ring walk makes redundant: a number that
+reaches the cold path cannot have its q in the ring, and the trial division by 2–17
+already done is not repeated before Miller–Rabin.
 
 Throughput on one 12-OCPU EPYC 9J14 VM, for the same work:
 
@@ -210,15 +217,18 @@ Throughput on one 12-OCPU EPYC 9J14 VM, for the same work:
 | v6.1 | fully-covered-batch shortcut | 14,825 |
 | v6.2 | carried words | 18,641 |
 
-On 24 OCPUs, v6.2 with K=56 reaches 41,526 M/s. Results for more machines (Apple M4
-with NEON, AVX2 laptops) are in [`docs/RESULTS.md`](docs/RESULTS.md).
+On 24 OCPUs, v6.2 with K=56 reaches 41,526 M/s. v6.3 gives identical output and, built
+with PGO, is faster than v6.2 on x86 and level with it on ARM: one thread, +6.9% on an
+Alder Lake laptop (AVX2) and +0.3% on an Apple M4 (NEON). Results for more machines are
+in [`docs/RESULTS.md`](docs/RESULTS.md).
 
 ## Repository layout
 
 | Path | What it is |
 | --- | --- |
-| `src/goldbach_v6_2.cpp` | **current verifier (v6.2)**; produced the 4.002→4.003·10^18 run |
-| `src/archive/goldbach_v6_2_11525e8d.cpp` | the exact revision used for that run (rebuilds the campaign binary bit-identically) |
+| `src/goldbach_v6_3.cpp` | **current verifier (v6.3)**: v6.2 plus a lean cold path and, with PGO, the carried index; identical output |
+| `src/goldbach_v6_2.cpp` | v6.2; produced the 4.002→4.003·10^18 run and the recomputation of segment 2 |
+| `src/archive/goldbach_v6_2_11525e8d.cpp` | the exact revision used for those runs (rebuilds the campaign binary bit-identically) |
 | `scripts/` | build scripts, witness and certificate verification, run comparison |
 | `docs/RESULTS.md` | campaign and performance tables |
 | `docs/PROVENANCE.md` | SHA-256 checksums tying each result to its source, binary and profile |

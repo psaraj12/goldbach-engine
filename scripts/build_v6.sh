@@ -1,15 +1,22 @@
 #!/usr/bin/env bash
-# Build and check a native v6.2 binary on this machine (Linux, GCC >= 11, python3-sympy).
+# Build and check a native v6 binary on this machine (Linux, GCC >= 11, python3-sympy).
 #   - picks the vector prefix: AVX-512 > AVX2 > NEON (ARM64) > scalar
 #   - picks the prefix length K for that prefix (override with KFIX=n)
 #       AVX-512 and NEON: 56 (EPYC 9J14, Apple M4); AVX2 and scalar: 32
 #   - trains a PGO profile at exactly the campaign settings
 #   - runs the bit-exact prefix check, the forced-miss check and a certificate dump
 #   - writes build/provenance_v6.txt (settings, source, binary and profile SHA-256)
-# Usage (from the repository root): bash scripts/build_v6.sh [path/to/goldbach_v6_2.cpp]
+# Usage (from the repository root): bash scripts/build_v6.sh [path/to/source.cpp]
+#   (default src/goldbach_v6_3.cpp)
 set -e
-SRC=${1:-src/goldbach_v6_2.cpp}
-BB=24; P=40000000; RING=512; TR=200000000; S=4000000000000000000; T=$(nproc)
+SRC=${1:-src/goldbach_v6_3.cpp}
+# Settings follow the source version: v6.3 uses anchor limit 2e7 and, with PGO, the carried
+# index (-DCARRYIDX); earlier versions use 4e7 and no extra flag, so the archived v6.2
+# campaign source still rebuilds exactly as it did. Overrides: GB_P=n, GB_EXTRA="flags".
+if grep -q 'PROG_VERSION = "goldbach_v6_3' "$SRC"; then PDEF=20000000; XDEF="-DCARRYIDX"
+else PDEF=40000000; XDEF=""; fi
+P=${GB_P:-$PDEF}; X=${GB_EXTRA-$XDEF}
+BB=24; RING=512; TR=200000000; S=4000000000000000000; T=$(nproc)
 if [ "$(uname -m)" = aarch64 ]; then
   F="-O3 -mcpu=native -fopenmp -std=c++17"; ISA=-DSIMD_NEON; KDEF=56
 else
@@ -25,17 +32,17 @@ case "$ISA" in
 esac
 KF="-DKFIX=$K"
 mkdir -p build && cp "$SRC" build/v6.cpp && cp scripts/verify_dump.py build/ && cd build
-echo "== vector prefix: ${ISA:-scalar}, K=$K"
-g++ $F $ISA $KF v6.cpp -o goldbach_v6_plain
-g++ $F $KF -DDUMP_ALL v6.cpp -o goldbach_v6_dump
+echo "== vector prefix: ${ISA:-scalar}, K=$K, anchor limit $P${X:+, $X}"
+g++ $F $ISA $KF $X v6.cpp -o goldbach_v6_plain
+g++ $F $KF $X -DDUMP_ALL v6.cpp -o goldbach_v6_dump
 rm -f gs.o gs.gcda
-g++ $F $ISA $KF -fprofile-generate -c v6.cpp -o gs.o && g++ $F -fprofile-generate gs.o -o gs_gen
+g++ $F $ISA $KF $X -fprofile-generate -c v6.cpp -o gs.o && g++ $F -fprofile-generate gs.o -o gs_gen
 mkdir -p train && (cd train && rm -f *.csv; ../gs_gen $S $((S+TR-2)) $BB 1 $P 1000 $RING > /dev/null)
 [ -s gs.gcda ] || { echo "PGO profile missing - STOP"; exit 1; }
-g++ $F $ISA $KF -fprofile-use -Wno-missing-profile -c v6.cpp -o gs.o && g++ $F gs.o -o goldbach_v6
+g++ $F $ISA $KF $X -fprofile-use -Wno-missing-profile -c v6.cpp -o gs.o && g++ $F gs.o -o goldbach_v6
 if [ -n "$ISA" ]; then
   echo "== bit-exact check of the vector prefix (K=$K)"
-  g++ $F $ISA $KF -DSIMD_CHECK v6.cpp -o goldbach_v6_check
+  g++ $F $ISA $KF $X -DSIMD_CHECK v6.cpp -o goldbach_v6_check
   mkdir -p chk_simd && (cd chk_simd && rm -f *.csv
     out=$(../goldbach_v6_check $S $((S+2*33554432-2)) $BB $T $P 1000 $RING 2>&1 | grep -E "SIMD checks|MISMATCH")
     echo "$out"; echo "$out" | grep -q "SIMD checks passed" || { echo "SIMD CHECK FAILED - STOP"; exit 1; })
@@ -49,11 +56,11 @@ diff <(grep -o "MISS.*" chk_goldbach_v6/err.txt) <(grep -o "MISS.*" chk_goldbach
 echo "== certificate dump at campaign settings (2^20 evens)"
 mkdir -p chk_dump && cd chk_dump && rm -f *.csv
 ../goldbach_v6_dump $S $((S+2*1048576-2)) $BB $T $P 1000 $RING > /dev/null
-python3 ../verify_dump.py goldbach_v62_dump.csv $S $((S+2*1048576-2)) $P
-rm -f goldbach_v62_dump.csv; cd ..
+D=$(ls goldbach_v6*_dump.csv); python3 ../verify_dump.py $D $S $((S+2*1048576-2)) $P
+rm -f $D; cd ..
 { date -u; lscpu 2>/dev/null | grep "Model name"; echo "threads=$T"; g++ --version | head -1
   echo "prefix: ${ISA:-scalar}; KFIX=$K; campaign settings: bb=$BB P=$P ring=$RING"
-  echo "compile flags: $F $ISA $KF (+ PGO)"
+  echo "compile flags: $F $ISA $KF${X:+ $X} (+ PGO)"
   echo "PGO training: 1 thread, [$S, $((S+TR-2))], bb=$BB P=$P ring=$RING"
   sha256sum v6.cpp goldbach_v6 gs.gcda; } | tee provenance_v6.txt
 echo "== done: build/goldbach_v6"

@@ -73,6 +73,40 @@ agree. 18 SIEVE rows, all in the final checkpoint, are not minimal. These rows s
 certify their N, but they show that the final checkpoint was not written by the
 archived source.
 
+## v6.3 against v6.2 (one thread, PGO builds, anchor limit 2·10^7)
+
+v6.3 makes the lean cold path permanent and adds the carried index (`-DCARRYIDX`), which
+`scripts/build_v6.sh` enables together with PGO. Both builds were trained and timed at
+anchor limit 2·10^7, block bits 24 and ring 512, on 10^10 even integers above 4·10^18. The
+builds alternated, with three runs each, and the table gives medians in M evens/s.
+
+| Build | Alder Lake laptop (AVX2, K=32) | Apple M4 (NEON, K=56) |
+| --- | --- | --- |
+| v6.2 | 1,307 | 1,833 |
+| v6.3, neither change | 1,319 | 1,833 |
+| v6.3, lean cold path only | 1,336 | 1,840 |
+| v6.3, carried index only | 1,390 | 1,831 |
+| v6.3, both | 1,397 (**+6.9%**) | 1,839 (**+0.3%**) |
+
+The carried index has no effect with NEON, because carried words are off there. Without
+PGO the picture on AVX2 is different: the carried index cost about 4% (median 1,207
+against 1,269 for v6.3 with neither change at anchor limit 4·10^7), which is why
+manual builds leave it out. On the AVX-512 EPYC, development measurements of the carried
+index with PGO gave +3–13%.
+
+On 12 threads, the laptop's runs varied by more than 20% between rounds (heat, and
+threads landing on efficiency cores), so they cannot resolve a difference of this size.
+The multi-thread figures in this file come from the EPYC VMs.
+
+v6.3 output is identical to v6.2: the same checkpoint rows and counters, checked for the
+AVX-512, AVX2 and scalar prefixes, with and without the carried index, at anchor limits
+4·10^7 and 2·10^7. Its builds also pass the bit-exact SIMD check, the forced-miss
+comparison of PGO and plain builds, and a row-by-row certificate dump.
+`src/goldbach_v6_3.cpp` is the tested experiment file
+(`goldbach_v6_3_test`, SHA-256 `18001fe9…b8a8`) with the lean cold path made
+permanent, its comments rewritten, and its output file names changed. Its output was
+re-checked against both v6.2 and the experiment file.
+
 ## Performance on one 12-OCPU EPYC 9J14 VM (24 threads, same work)
 
 | Build | M evens/s | vs v4 |
