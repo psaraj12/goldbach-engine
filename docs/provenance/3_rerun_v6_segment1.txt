@@ -1,0 +1,12 @@
+# Provenance: v6 independent recomputation of v5 segment 1
+# [4000000000000000000, 4000318999999999998], 159,500,000,000,000 even integers
+# Reconstructed on 2026-10-01 from the build record printed on the VM at build time
+# (2026-09-30, OCI VM.Standard.E5.Flex, 24 OCPUs / 48 threads, AMD EPYC 9J14).
+# The original provenance_reseg1.txt was written by:
+#   sha256sum goldbach_v6_simd.cpp esim_avx512 es.gcda | tee provenance_reseg1.txt
+build: g++ -O3 -march=native -fopenmp -std=c++17 -DSIMD_AVX512 (+ PGO)
+       KFIX default 32; PGO training: 1 thread, [4e18, 4e18 + 2e8 - 2], bb=24 P=40000000 ring=512
+run:   esim_avx512 4000000000000000000 4000318999999999998 24 48 40000000 250000 512
+6a7ace5fd6a37ba820a4b814067dc4f3582076f5d5f8b41d1ac7e46f5906f0af  goldbach_v6_simd.cpp
+7d8f4ec3700effb6f6e8a2606028c85c82336077aee325566ba33c7d7c481efe  esim_avx512
+cc3890f2dfaf08b5d11fa7a985b6e10869e357f49844625d6c1ac5e543c592d7  es.gcda

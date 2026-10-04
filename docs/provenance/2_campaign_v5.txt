@@ -1,0 +1,7 @@
+b23c765a1ac9232d7253b005eedc018b001d1a2e6f77d383236c5ca6bcc8fb0a  goldbach_v5_batch.cpp
+8187c1c7d0486da02e6e48adc398cb69c9bcb4065cd8a68c4cbb38b5c1a05097  goldbach_v5_batch
+Model name:                              AMD EPYC 9J14 96-Core Processor
+24
+g++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+segment 2: start=4000319000000000000 end=4000999999999999998 p_anchor_limit=1000000
+segment 2: start= end=4000999999999999998 p_anchor_limit=1000000

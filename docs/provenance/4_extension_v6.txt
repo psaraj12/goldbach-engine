@@ -1,0 +1,15 @@
+# Provenance: v6 extension [4001000000000000000, 4001999999999999998], 500,000,000,000,000 even integers
+# Reconstructed on 2026-10-01 from the build record printed by scripts/build_v6.sh on the VM
+# (the original provenance_campaign_v6.txt was a copy of build/provenance_v6.txt plus the campaign line).
+Wed Sep 30 15:13:32 UTC 2026
+Model name:                              AMD EPYC 9J14 96-Core Processor
+threads=48
+g++ (Ubuntu 15.2.0-16ubuntu1) 15.2.0
+prefix: -DSIMD_AVX512; KFIX=40; campaign settings: bb=24 P=40000000 ring=512
+compile flags: -O3 -march=native -fopenmp -std=c++17 -DSIMD_AVX512 -DKFIX=40 (+ PGO)
+PGO training: 1 thread, [4000000000000000000, 4000000000199999998], bb=24 P=40000000 ring=512
+6a7ace5fd6a37ba820a4b814067dc4f3582076f5d5f8b41d1ac7e46f5906f0af  v6.cpp
+9d3cc2808307ea263b6756e92bb5b599843be1d0f7de431cc4c856dc0bd3301c  goldbach_v6
+4f7de34b64fa5f86abd0875316d6260b60cfe520642e69f492ae02bca4a0f687  gs.gcda
+campaign: 4001000000000000000 .. 4001999999999999998, sample_limit 250000
+note: paused once (benchmark) and resumed with the same binary (--resume)

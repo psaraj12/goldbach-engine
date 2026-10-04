@@ -1,0 +1,15 @@
+== campaign
+campaign: 4002000000000000000 .. 4002999999999999998, sample_limit 250000
+== build record (reproduced 2026-10-01 from the same source; binary identical to the campaign binary)
+Thu Oct  1 09:16:23 UTC 2026
+Model name:                              AMD EPYC 9J14 96-Core Processor
+threads=48
+g++ (Ubuntu 15.2.0-16ubuntu1) 15.2.0
+prefix: -DSIMD_AVX512; KFIX=56; campaign settings: bb=24 P=40000000 ring=512
+compile flags: -O3 -march=native -fopenmp -std=c++17 -DSIMD_AVX512 -DKFIX=56 (+ PGO)
+PGO training: 1 thread, [4000000000000000000, 4000000000199999998], bb=24 P=40000000 ring=512
+11525e8d03ba285d9541516399dc0ddd3732b8977b5087b4d7a4ca26c06d10d2  v6.cpp
+bfea4378691c270f0d12e1a4d65b1f1d059c74ce370ee0e7da723bc2b017a370  goldbach_v6
+cd2d1cd06a0c69d4d8e239637889e3e5fa2caf7520f83f8d9fec9af194bfe683  gs.gcda
+== campaign binary
+bfea4378691c270f0d12e1a4d65b1f1d059c74ce370ee0e7da723bc2b017a370  build/goldbach_v6

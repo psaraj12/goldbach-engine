@@ -1,34 +1,54 @@
 # Results
 
-## Campaign: [4·10^18, 4.001·10^18] (v5)
+Every even integer in [4·10^18, 4.003·10^18] was verified to be a sum of two primes
+(1.5·10^15 numbers, zero misses). Each part of the range was verified by at least
+two independent runs. Run numbers match the folders of the Zenodo data record and
+[`PROVENANCE.md`](PROVENANCE.md).
 
-| | Segment 1 | Segment 2 | Campaign |
-| --- | --- | --- | --- |
-| Range | 4·10^18 → 4,000,318,999,999,999,998 | 4,000,319,000,000,000,000 → 4,000,999,999,999,999,998 | 4·10^18 → 4.001·10^18 − 2 |
-| Even integers | 1.595·10^14 | 3.405·10^14 | 5.000·10^14 |
-| Anchor limit / ring / block bits | 10^5 / 64 / 24 | 10^6 / 64 / 24 | |
-| Exceptions | 0 | 0 | 0 |
-| Ring hit rate | 99.9167% | 99.9839% | |
-| Miller–Rabin calls per N | 0.00644 | 0.00124 | 0.00290 |
-| Wall time | 16.5 h | 17.2 h | 33.7 h |
-| Throughput (M/s) | 2,689 | 5,494 | 4,122 average |
-| Witnesses | 63,800 | 136,200 | 200,000 |
+## Coverage
 
-Hardware: OCI VM.Standard.E5.Flex, 12 OCPUs (24 threads), AMD EPYC 9J14.
-All 200,000 witnesses verified independently; all 100,000 COLD witnesses are
-minimal partitions.
+| Range | Primary run | Independent rerun(s) | COLD witnesses compared | Identical |
+| --- | --- | --- | --- | --- |
+| [4.000, 4.001)·10^18 | 2: v5 campaign | campaign 1 (full range); 3: v6 (first 1.595·10^14) | 31,900 (run 2 vs run 3) | all |
+| [4.001, 4.002)·10^18 | 4: v6, K=40 | 6: v5 | 100,000 | all |
+| [4.002, 4.003)·10^18 | 5: v6.2, K=56 | 6: v5 | 100,000 | all |
 
-## Extension to 4.002·10^18 (v6)
+COLD witnesses are minimal partitions, so two correct runs with the same block size
+must produce the same COLD rows. QHOT rows may legitimately differ. Here 57–58% of
+QHOT rows coincide, because the two programs use different rings.
 
-[4.001·10^18, 4.002·10^18 − 2]: 5·10^14 even integers, zero exceptions, 7.25 h at
-19,145 M/s on 24 OCPUs (v6, AVX-512, K=40). All 200,000 witnesses verified; all
-100,000 COLD witnesses minimal. Contiguous with the v5 campaign.
+## Runs
 
-## Independent recomputation (v6)
+| | 2: v5 seg. 1 | 2: v5 seg. 2 | 3: v6 rerun seg. 1 | 4: v6 ext. | 5: v6.2 ext. | 6: v5 rerun ext. |
+| --- | --- | --- | --- | --- | --- | --- |
+| First N | 4,000,000,000,000,000,000 | 4,000,319,000,000,000,000 | 4,000,000,000,000,000,000 | 4,001,000,000,000,000,000 | 4,002,000,000,000,000,000 | 4,001,000,000,000,000,000 |
+| Last N | 4,000,318,999,999,999,998 | 4,000,999,999,999,999,998 | 4,000,318,999,999,999,998 | 4,001,999,999,999,999,998 | 4,002,999,999,999,999,998 | 4,002,999,999,999,999,998 |
+| Even integers | 1.595·10^14 | 3.405·10^14 | 1.595·10^14 | 5·10^14 | 5·10^14 | 10^15 |
+| Anchor limit / ring | 10^5 / 64 | 10^6 / 64 | 4·10^7 / 512 | 4·10^7 / 512 | 4·10^7 / 512 | 10^6 / 64 |
+| Misses | 0 | 0 | 0 | 0 | 0 | 0 |
+| Ring hit rate | 99.916694% | 99.983884% | 99.999132% | 99.999132% | 99.999132% | 99.983884% |
+| Miller–Rabin calls per N | 0.00644 | 0.00124 | 0.000070 | 0.000070 | 0.000070 | 0.00124 |
+| Wall time | 16.5 h | 17.2 h | 2.39 h | 7.25 h | 3.36 h | 25.5 h |
+| Throughput (M/s) | 2,689 | 5,494 | 18,561 | 19,145 | 41,373 | 10,874 |
+| VM | 12 OCPUs | 12 OCPUs | 24 OCPUs | 24 OCPUs | 24 OCPUs | 24 OCPUs |
+| Witness rows | 63,800 | 136,200 | 63,800 | 200,000 | 200,000 | 400,000 |
 
-Both segments recomputed with v6 (AVX-512 prefix, anchor limit 4·10^7, ring 512)
-on a 24-OCPU VM. Segment 1: zero exceptions; all 31,900 COLD witnesses identical to v5; all 63,800
-v6 witnesses verified. Segment 2: *to be filled*.
+All block bits are 24. Hardware for every run: OCI VM.Standard.E5.Flex, AMD EPYC 9J14,
+two threads per OCPU. Run 4 was paused once for a benchmark and resumed with the same
+binary, and its wall time is the total of both parts. Segment 1 of run 2 was stopped at
+4,000,318,999,999,999,998, and segment 2 started at the next even number with a
+larger anchor limit.
+
+## Witness checks
+
+Every witness row of every run (1,063,800 rows) was re-checked with
+`scripts/verify_witnesses.py --minimal` (SymPy 1.14). The checks were: N even,
+p + q = N, p and q prime, p within the anchor limit, N inside the verified range, and
+each COLD witness minimal. All rows passed. The largest COLD p is 2,237, well inside
+the script's minimality search bound of 20,000, so the minimality check is complete.
+
+Run 3 covers only segment 1 of the v5 campaign. Segment 2 has not been recomputed
+with v6. Its second verification is campaign 1.
 
 ## Performance on one 12-OCPU EPYC 9J14 VM (24 threads, same work)
 

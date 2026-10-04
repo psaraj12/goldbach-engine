@@ -1,0 +1,10 @@
+run: independent recomputation of [4.001e18, 4.003e18) with v5 (campaign 2 source)
+range: 4001000000000000000 .. 4002999999999999998, bb=24, P=1000000, ring=64, sample_limit=400000
+build: g++-13 -O3 -march=native -fopenmp -std=c++17 (no PGO, as campaign 2)
+note: campaign 2 binary was 8187c1c7... (Ubuntu 24.04, GCC 13.3.0); this build differs in bytes only
+Thu Oct  1 16:07:06 UTC 2026
+Model name:                              AMD EPYC 9J14 96-Core Processor
+threads=48
+g++-13 (Ubuntu 13.4.0-10ubuntu1) 13.4.0
+b23c765a1ac9232d7253b005eedc018b001d1a2e6f77d383236c5ca6bcc8fb0a  goldbach_v5_batch.cpp
+216f17eb9ef8cf5f21bf31fd883f3971a64de418759cf3f1e420371de62be634  goldbach_v5_batch
