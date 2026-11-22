@@ -1,0 +1,6 @@
+twin only          failures to 1e7: 1,334,283  by N mod 3 (0,1,2)=[0, 0, 1334283]  first: [38, 68, 80, 98, 122, 128]  (197s)
+cousin only        failures to 1e7: 1,334,472  by N mod 3 (0,1,2)=[0, 1334472, 0]  first: [28, 52, 58, 88, 94, 118]  (188s)
+twin or cousin     failures to 1e7:         0  by N mod 3 (0,1,2)=[0, 0, 0]  first: []  (1s)
+sexy only (p+6)    failures to 1e7:         1  by N mod 3 (0,1,2)=[1, 0, 0]  first: [6]  (0s)
+gap 8 only         failures to 1e7: 1,334,283  by N mod 3 (0,1,2)=[0, 0, 1334283]  first: [38, 68, 80, 98, 122, 128]  (194s)
+gap 12 only        failures to 1e7:         1  by N mod 3 (0,1,2)=[1, 0, 0]  first: [6]  (0s)

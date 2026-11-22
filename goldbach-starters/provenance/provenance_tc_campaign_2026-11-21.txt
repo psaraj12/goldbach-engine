@@ -1,0 +1,11 @@
+Sat Nov 21 06:11:45 UTC 2026
+Model name:                           12th Gen Intel(R) Core(TM) i5-1235U
+threads=12
+g++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+prefix: -DSIMD_AVX2; KFIX=32; campaign settings: bb=24 P=40000000 ring=512
+anchors: twin/cousin starters; forced-miss limit: 8000
+compile flags: -O3 -march=native -fopenmp -std=c++17 -DSIMD_AVX2 -DKFIX=32 (+ PGO)
+PGO training: 1 thread, [4000000000000000000, 4000000000199999998], bb=24 P=40000000 ring=512
+37da1af2baccf74e546abc96facc1f76130468422f67dab44ddd042c66f5dd04  v6.cpp
+19ad466372b7c86f47c2685ec9034542192d0453177968e7a8da2d16ee327476  goldbach_v6
+fa85fee461a7602b6a5b16bf081c49538d84bab00fa792f4578ddf79c6e8ee54  gs.gcda

@@ -1,0 +1,12 @@
+Sun Nov 22 16:01:05 UTC 2026
+Model name:                           12th Gen Intel(R) Core(TM) i5-1235U
+threads=12
+g++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+binary checkpoint file: goldbach_sx_checkpoint.csv
+prefix: -DSIMD_AVX2; KFIX=32; campaign settings: bb=24 P=40000000 ring=512
+anchors: sexy starters (p+6 prime); forced-miss limit: 8000
+compile flags: -O3 -march=native -fopenmp -std=c++17 -DSIMD_AVX2 -DKFIX=32 -DSEXY_ANCHORS (+ PGO)
+PGO training: 1 thread, [4000000000000000000, 4000000000199999998], bb=24 P=40000000 ring=512
+841c219e503eff33ce81fb7dae118a07a3456b5d4507b5fc429364a53d2c4a20  v6.cpp
+6d572f850de812edd6690e76ea9653460af975a3f568785c0fe7fa3645f53c75  goldbach_v6
+4777c7f4aadc1ffdcae554e729f68a7718cc6a9f435c8074366a4ca5f60dab06  gs.gcda

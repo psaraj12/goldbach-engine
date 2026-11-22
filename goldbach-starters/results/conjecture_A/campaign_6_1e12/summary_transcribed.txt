@@ -1,0 +1,19 @@
+# Console summary transcribed by the author (Sat 2026-11-21, IST); no run.log was kept for this run. Binary: provenance_tc_campaign_2026-11-21.txt
+# Settings, as recorded in goldbach_tc_checkpoint.csv: block bits 24, 12 threads, P = 20000000, sample limit 1000, ring 512.
+# Command: goldbach_v6 6 1000000000000 24 12 20000000 1000 512 --minp-per-window=5000
+===== FINAL SUMMARY =====
+Full range:        [6 .. 1000000000000]
+Coverage:          499999999998 / 499999999998
+Misses:            0 (unresolved: 0, anchor-exhausted: 0)
+QHot hit rate:     99.983620%
+QHot probes/N:     3.510580
+Cold cand/N:       0.003083   (anchor primes considered)
+Cold surv/N:       0.000791   (survived trial division)
+MR calls/N:        0.000791   (Miller-Rabin invocations)
+Total time:        994.664459 s
+Throughput:        502.682081 M/s
+Samples:           200
+Minp rows:         500000 (goldbach_tc_minp.csv)
+Checkpoints:       5
+Output:            goldbach_tc_checkpoint.csv
+Miss report:       goldbach_tc_misses.csv

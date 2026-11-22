@@ -1,0 +1,19 @@
+CHECKPOINT
+  version=goldbach_v6_4_sx_anchor  range=[8,1000000000000]  last_verified=1000000000000
+  total_verified=499999999997  expected evens=499999999997  match=True
+  total_misses=0 unresolved=0
+  ring hit rate=99.954066%  mr_calls==cold_survivors: True
+  samples=200  all witnesses valid (p,p+6,q prime, p+q=N): True  bad=[]
+MISSES file: 0 rows
+MINP rows=500000
+  types: {'S'}  p_twin==p: True  p_cousin all 0: True
+  rows with invalid witness: 0
+  minimality spot-check (2000 rows): non-minimal = 0
+  fuel by N mod 3:
+    0: n=166,666 mean    51.3  median    23  max  1997
+    1: n=166,667 mean   122.4  median    47  max  4253
+    2: n=166,667 mean   166.8  median    67  max  4357
+  overall mean 113.5  max 4357 at N=140,000,007,296
+    N mod 3=0: minimal p by p mod 3 (0,1,2) = [0, 73371, 93295]
+    N mod 3=1: minimal p by p mod 3 (0,1,2) = [0, 0, 166667]
+    N mod 3=2: minimal p by p mod 3 (0,1,2) = [0, 166666, 1]

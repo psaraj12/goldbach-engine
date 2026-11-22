@@ -1,0 +1,15 @@
+CHECKPOINT
+  version=goldbach_v6_4_tc_anchor  range=[1000000000002,10000000000000]  last_verified=10000000000000  P=10000000
+  total_verified=4500000000000  expected evens=4500000000000  match=True
+  total_misses=0 unresolved=0
+  ring hit rate=99.983766%  mr_calls==cold_survivors: True
+  samples=1000  all witnesses valid (p twin/cousin starter, q prime, p+q=N): True  bad=[]
+MISSES file: 0 rows
+MINP rows=900000  N range [1,000,000,000,002 .. 9,990,000,002,000]
+  rows with invalid witness: 0
+  type column matches (first 50,000 rows): mismatches = 0
+  p == min(nonzero p_twin, p_cousin) for every row: True
+  classes N=0,1 (mod 3) always have a twin partner: True
+  class N=2: twin partner exists exactly when N-3 is prime (Prop. 3): True
+  minimality spot-check (2000 rows, overall/twin/cousin minima): wrong = 0
+  least starter: mean 120.0  max 6,197 at N = 7,940,000,001,286

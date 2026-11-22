@@ -1,0 +1,497 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{conjecture}{Conjecture}
+\renewcommand{\theconjecture}{\Alph{conjecture}}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\newcommand{\Pp}{\mathbb{P}}
+
+\title{Goldbach Partitions with a Twin, Cousin or Sexy Starter:\\
+a Mod-3 Obstruction, a Density Law, and Verification to $10^{13}$}
+
+\author{Santhiagu Antony Raj Parthibanathan\\
+\small Independent researcher, Tamil Nadu, India\\
+\small ORCID: \href{https://orcid.org/0009-0002-0355-4191}{0009-0002-0355-4191}
+\quad Email: \href{mailto:psaraj12@gmail.com}{\texttt{psaraj12@gmail.com}}}
+
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Call an odd prime $p$ a \emph{twin starter} if $p+2$ is prime, a \emph{cousin
+starter} if $p+4$ is prime, and a \emph{sexy starter} if $p+6$ is prime. We
+study two strengthenings of the binary Goldbach conjecture: (A) every even
+$N\ge 6$ is $p+q$ with $q$ prime and $p$ a twin or cousin starter; (B) every
+even $N\ge 8$ is $p+q$ with $q$ prime and $p$ a sexy starter. Both are verified
+exhaustively with a dedicated C++/OpenMP verifier: (A) for all even
+$6\le N\le 10^{13}$ and (B) for all even $8\le N\le 10^{12}$, with every witness
+satisfying $p\le 2\cdot 10^7$; neither has a counterexample. We explain why
+(A) needs two gaps while (B) needs one. Twin starters alone fail
+\emph{exactly} for the even $N\equiv 2\pmod 6$ with $N-3$ composite, and this
+set has relative density $\tfrac13-(1+o(1))/\ln X$ among even $N\le X$, an
+unconditional consequence of the prime number theorem for arithmetic
+progressions. Cousin starters alone fail exactly on the mirror class. The
+prime $3$ is the only modulus that can block a whole residue class in this
+way, and it does so precisely when $3\nmid g$ for the gap $g$; for $g=6$ it
+only halves the usable starters. The measured fraction of even $N$ lacking a
+twin-starter partition agrees with the predicted law
+$\tfrac13\,(1-3/\ln N)$ to within sampling error from $10^4$ to $10^{13}$.
+\end{abstract}
+
+\section{Introduction}
+
+\paragraph{The idea in plain words.}
+Goldbach's conjecture says every even number from $4$ upward is a sum of two
+primes. Look at the partitions of a large even number and a striking pattern
+appears: one of the two primes can almost always be chosen \emph{very small},
+and that small prime can almost always be chosen to sit right next to another
+prime. For example, it might be a $p$ with $p+2$ also prime. It is as if the
+partitions of consecutive even numbers were pushed forward by a small engine
+built out of nearby prime pairs: a partition of $N$ with $q$ prime and $q+2$
+prime immediately gives a partition of $N+2$. This paper turns that picture
+into two precise conjectures, verifies them over trillions of cases, and
+explains exactly which prime pairs the engine needs and why. The answer
+comes down to arithmetic modulo $3$.
+
+\paragraph{Statements.}
+
+\begin{definition}
+An odd prime $p$ is a \emph{twin starter} if $p+2\in\Pp$, a \emph{cousin
+starter} if $p+4\in\Pp$, and a \emph{sexy starter} if $p+6\in\Pp$. More
+generally, for even $g\ge 2$ it is a \emph{$g$-starter} if $p+g\in\Pp$.
+\end{definition}
+
+\begin{conjecture}[twin/cousin starters]\label{conj:A}
+Every even $N\ge 6$ can be written $N=p+q$ with $q$ prime and $p$ a twin
+starter or a cousin starter.
+\end{conjecture}
+
+\begin{conjecture}[sexy starters]\label{conj:B}
+Every even $N\ge 8$ can be written $N=p+q$ with $q$ prime and $p$ a sexy
+starter.
+\end{conjecture}
+
+Both conjectures imply Goldbach's conjecture for the corresponding range. Both
+also imply that the starter sets are infinite: if only finitely many starters
+existed, $N-p$ would eventually be forced to take a composite value for some $N$.
+(For instance, by choosing $N$ with $N-p$ divisible by a fixed prime for every
+one of the finitely many $p$; see Remark~\ref{rem:infinitude}.) So
+Conjecture~\ref{conj:A} implies there are infinitely many twin or cousin
+prime pairs, and Conjecture~\ref{conj:B} implies infinitely many sexy prime
+pairs. Neither statement is proved.
+
+In every verified case the witness $p$ is tiny compared with $N$: the least
+starter partner never exceeded $6{,}197$ in our sampled windows up to
+$10^{13}$ (Section~\ref{sec:fuel}). In particular the witness is always the
+\emph{smaller} part of the partition for $N>4\cdot 10^7$.
+
+\paragraph{Related work.}
+Representations of even numbers using twin primes go back at least to
+Zwillinger~\cite{Zwillinger}. Dubner~\cite{Dubner} conjectured that every even
+$n>4208$ is a sum of two twin-prime \emph{members} (OEIS
+A007534~\cite{A007534}). Sahu~\cite{Sahu} and, independently and much more
+extensively, Pandey~\cite{Pandey} studied the intermediate statement that every
+even $n\ge 6$ is $p+t$ with $p$ prime and $t$ a member (lower or upper) of a
+twin pair. Pandey verified it to $10^{14}$ and observed the same mod-3
+``orientation rigidity'' that underlies Section~\ref{sec:mod3}. Gómez~\cite{Gomez}
+proposed weaker twin, cousin and sexy variants (either summand may be either
+member of its pair), checked up to about $6.5\cdot 10^9$. Sun~\cite{Sun}
+formulated many refinements of Goldbach involving prime pairs, including sexy
+pairs, though with different side conditions. Oliveira e Silva, Herzog and
+Pardi~\cite{OHP} verified the binary Goldbach conjecture to $4\cdot 10^{18}$, and the
+author extended this to $4.003\cdot10^{18}$ with the Q-Hot method~\cite{QHot2}, whose
+verifier is reused here (Section~\ref{sec:computation}). The forward-propagation
+step of the introduction (if $N=p+q$ and $p+2k$ is prime, then
+$N+2k=(p+2k)+q$) is the basis of that method and was first described in the
+author's April 2026 preprint~\cite{QHot}.
+
+As far as we can tell, the precise Conjectures~\ref{conj:A} and~\ref{conj:B}
+(lower members of gap-$2$/gap-$4$ pairs, and lower members of gap-$6$ pairs,
+respectively), the density law of Theorem~\ref{thm:law}, and the
+classification of gaps by $g \bmod 3$ (Proposition~\ref{prop:only3}) have not
+appeared before. We welcome corrections. The new contribution relative
+to~\cite{Pandey} is that Conjecture~\ref{conj:A} covers the blocked residue
+class with \emph{cousin} pairs rather than upper twin members, together with the
+single-gap Conjecture~\ref{conj:B} and the quantitative results below.
+
+\section{The mod-3 obstruction}\label{sec:mod3}
+
+\begin{lemma}\label{lem:residues}
+Let $p>3$ be prime.
+\begin{enumerate}
+\item If $p$ is a twin starter then $p\equiv 2\pmod 3$.
+\item If $p$ is a cousin starter then $p\equiv 1\pmod 3$.
+\item A sexy starter may lie in either nonzero class modulo $3$.
+\item $3$ is both a twin starter $(3,5)$ and a cousin starter $(3,7)$, and it is
+the only prime that is both. It is not a sexy starter, since $9$ is composite.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+If $p\equiv1$ then $p+2\equiv0\pmod 3$, so $p+2$ is not prime unless it equals $3$; this
+proves (1), and (2) is identical with $p+4$. For (3), $p+6\equiv p\pmod 3$.
+For (4), among $p,p+2,p+4$ one is divisible by $3$, so all three are prime only
+for $p=3$.
+\end{proof}
+
+\begin{proposition}\label{prop:twinblock}
+Let $N\ge 8$ be even.
+\begin{enumerate}
+\item If $N\equiv 2\pmod 6$, then $N=p+q$ with $q$ prime and $p$ a twin
+starter if and only if $N-3$ is prime.
+\item If $N\equiv 4\pmod 6$, then $N=p+q$ with $q$ prime and $p$ a cousin
+starter if and only if $N-3$ is prime.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+(1) If $N-3$ is prime, take $p=3$. Conversely, let $N=p+q$ with $p$ a twin
+starter and $q$ prime. If $p=3$ then $q=N-3$. If $p>3$ then
+$p\equiv 2\pmod 3$ by Lemma~\ref{lem:residues}, so $q=N-p\equiv 0\pmod 3$, hence
+$q=3$ and $p=N-3$ is prime. (2) is identical, using $p\equiv1\pmod3$ for
+cousin starters $p>3$.
+\end{proof}
+
+So neither gap works alone. Twin starters fail for every $N\equiv 2\pmod 6$ with
+$N-3$ composite, and cousin starters fail for every $N\equiv 4\pmod 6$ with
+$N-3$ composite. Both sets are infinite and, by Theorem~\ref{thm:law}, each
+has relative density $1/3$ among even numbers. In the other direction,
+Proposition~\ref{prop:twinblock} turns Conjecture~\ref{conj:A} into three
+cleaner statements, one per residue class. We call this the \emph{gearbox}.
+
+\begin{corollary}[gearbox form]\label{cor:gearbox}
+Conjecture~\ref{conj:A} is equivalent to the conjunction of:
+\begin{enumerate}
+\item[(a)] every even $N\equiv 0\pmod 6$ has a twin-starter or cousin-starter
+partition;
+\item[(b)] every even $N\equiv 4\pmod 6$ has a twin-starter partition;
+\item[(c)] every even $N\equiv 2\pmod 6$, $N\ge 8$, has a cousin-starter partition.
+\end{enumerate}
+\end{corollary}
+
+\begin{proof}
+For $N\equiv 4\pmod 6$, a cousin-starter partition exists only when $N-3$ is
+prime (Proposition~\ref{prop:twinblock}(2)), and then $p=3$ is also a twin
+starter. So in this class Conjecture~\ref{conj:A} is equivalent to (b). The
+class $N\equiv 2\pmod 6$ is symmetric.
+\end{proof}
+
+Empirically the gearbox is rigid. Up to $10^8$, the even $N$ with no
+twin-starter partition are \emph{exactly} the $N\equiv 2\pmod 6$ with $N-3$
+composite (exhaustive check), and the same holds for every one of the
+$1.4\times10^6$ sampled $N$ up to $10^{13}$ (Section~\ref{sec:fuel}).
+
+\begin{proposition}[only $3$ obstructs]\label{prop:only3}
+Let $g\ge 2$ be even and let $\ell$ be a prime. Call a residue class
+$N\bmod \ell$ \emph{blocked for gap $g$} if every $g$-starter $p$ with $p\ne\ell$
+and $p+g\ne\ell$ satisfies $p\equiv N\pmod\ell$. (Then $q=N-p$ is divisible
+by $\ell$, and the argument of Proposition~\ref{prop:twinblock} applies.)
+A blocked class can exist only for $\ell=3$ and $3\nmid g$.
+\end{proposition}
+
+\begin{proof}
+Such $g$-starters avoid the residues $0$ and $-g$ modulo $\ell$, which leaves
+$\ell-2$ allowed classes (or $\ell-1$ if $\ell\mid g$). A class can be blocked
+only if a single class is allowed, which forces $\ell-2=1$ and $\ell\nmid g$.
+\end{proof}
+
+For $\ell\ge5$, ruling out a blocked class needs at least two allowed
+residue classes to contain starters. This is the expected situation, but proving it
+is beyond current methods, since it asks for prime pairs in arithmetic
+progressions. Proposition~\ref{prop:only3} should be read as saying that the
+congruence argument has no analogue beyond $\ell=3$. It explains what we see:
+
+\begin{itemize}
+\item For $g\equiv 2\pmod 3$ with $3+g$ prime ($g=2,8,14,20,\dots$), the proof of
+Proposition~\ref{prop:twinblock}(1) applies verbatim. Within the class
+$N\equiv 2\pmod 6$, the single-gap version fails exactly when $N-3$ is composite.
+For $g=8$, the full failure set up to $10^7$ coincides element by element with
+that of $g=2$ ($1{,}334{,}283$ failures, all with $N\equiv 2 \pmod 6$).
+\item For $3\mid g$ there is no blocked class. The single-gap versions with
+$g=6$ and $g=12$ have no failure among even $8\le N\le 10^7$, and
+Conjecture~\ref{conj:B} ($g=6$) is verified to $10^{12}$
+(Section~\ref{sec:computation}).
+\end{itemize}
+
+\begin{remark}[blocking versus halving]\label{rem:halving}
+For sexy starters the prime $3$ does not block, but it \emph{halves}. If
+$N\equiv 1\pmod 3$ and $q>3$, then $p\equiv 2\pmod 3$; if $N\equiv 2\pmod 3$ and
+$q>3$, then $p\equiv 1\pmod 3$; for $N\equiv0\pmod3$ both classes are usable.
+Our data match this exactly: among $500{,}000$ minimal sexy witnesses up to
+$10^{12}$, every $N\equiv1\pmod3$ used $p\equiv2$, and every $N\equiv2\pmod3$
+used $p\equiv1$ except $N=8=5+3$. Table~\ref{tab:fuel} shows the resulting
+cost per class.
+\end{remark}
+
+\begin{remark}\label{rem:infinitude}
+If the set $S$ of starters (of any fixed kind) were finite, the Chinese
+remainder theorem would give infinitely many even $N$ with $N-p$ divisible by
+some prime $\ell_p$ and $N-p\neq \ell_p$ for every $p\in S$. Each such $N$ would be a
+counterexample. Hence Conjecture~\ref{conj:A} implies infinitely many twin or
+cousin pairs, and Conjecture~\ref{conj:B} implies infinitely many sexy pairs.
+\end{remark}
+
+\section{A density law}\label{sec:law}
+
+Let $\pi(x;6,5)$ count primes $\le x$ that are $\equiv 5\pmod 6$.
+
+\begin{theorem}\label{thm:law}
+Let $B(X)$ be the number of even $N\le X$ with $N\equiv 2\pmod 6$ and $N-3$
+composite (equivalently, by Proposition~\ref{prop:twinblock}, with no
+twin-starter partition in that class). Then
+\[
+B(X)=\frac{X}{6}-\pi(X-3;6,5)+O(1)
+=\frac{X}{6}-(1+o(1))\frac{X}{2\ln X},
+\]
+so the proportion of such $N$ among the even $N\le X$ is
+$\tfrac13-(1+o(1))/\ln X$.
+\end{theorem}
+
+\begin{proof}
+The map $N\mapsto N-3$ sends $\{N\le X:N\equiv2\pmod6\}$ bijectively onto
+$\{m\le X-3: m\equiv5\pmod6\}$. The count follows, and the asymptotic is the prime
+number theorem for arithmetic progressions,
+$\pi(x;6,5)\sim x/(\varphi(6)\ln x)=x/(2\ln x)$~\cite{Davenport}.
+\end{proof}
+
+Locally, the density of the blocked set near $N$ is
+$\tfrac13\,(1-3/\ln N)$: one third of all even numbers, minus the fraction
+rescued by the $p=3$ route, which works with probability $3/\ln N$ because
+$N-3$ lies in a class mod $6$ that contains half of all primes. Let $E_T$ be
+the set of even $N$ with no twin-starter partition at all. Then $E_T$ contains
+the blocked set, and the gearbox conjecture (Corollary~\ref{cor:gearbox}(a),(b) with
+twin starters) says they are equal. Table~\ref{tab:law} compares the measured
+density of $E_T$ with the band average of $\tfrac13(1-3/\ln N)$.
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{lrrr}
+\toprule
+Range of $N$ & Sample & Measured $|E_T|$ share & Predicted \\
+\midrule
+$[6,10^4]$ & all & $21.01\%$ & $20.91\%$\\
+$(10^4,10^5]$ & all & $24.02\%$ & $24.02\%$\\
+$(10^5,10^6]$ & all & $25.68\%$ & $25.67\%$\\
+$(10^6,10^7]$ & all & $26.82\%$ & $26.82\%$\\
+$(10^7,10^8]$ & all & $27.67\%$ & $27.67\%$\\
+$[10^{12},10^{13}]$ & $9\times10^5$ & $29.935\%$ & $29.906\%$\\
+\bottomrule
+\end{tabular}
+\caption{Fraction of even $N$ with no twin-starter partition, against the band
+average of $\frac13(1-3/\ln N)$. The rows up to $10^8$ are exhaustive. The last row
+uses the first $1000$ even $N$ of each of the $900$ stretches of length
+$10^{10}$ (sampling standard error $\approx 0.05\%$). Within the class
+$N\equiv2\pmod 6$ the measured share there is $89.81\%$, against
+$1-3/\ln N$ averaged over the range, $89.72\%$.}
+\label{tab:law}
+\end{table}
+
+The approach to $1/3$ is extremely slow: the shortfall is $\approx 1/\ln N$,
+still $3.3\%$ at $N=10^{13}$. The local value $\tfrac13(1-3/\ln N)$ reaches
+$30\%$ only at $N=e^{30}\approx 1.07\times10^{13}$, and $33\%$ only near $10^{130}$.
+The limit itself will never be visible in computation; it is known only through
+Theorem~\ref{thm:law}.
+
+\section{Computation}\label{sec:computation}
+
+\paragraph{Algorithm.}
+The verifier is the Q-Hot method of~\cite{QHot,QHot2}, in the bitset form
+of~\cite{QHot2}, with one change: its
+\emph{anchor bitset}, which in~\cite{QHot2} marks every odd prime up to $P$, here
+marks only the starters up to $P$ ($P=10^7$ or $2\cdot10^7$, see Table~\ref{tab:runs}; twin or cousin starters for
+Conjecture~\ref{conj:A}, sexy starters for Conjecture~\ref{conj:B}). It is built
+once by a sieve. Each thread keeps a \emph{ring} of up to $512$ large primes $q$
+that recently completed a partition. The method rests on the observation of the
+introduction: if $N=p+q$, then $N+2k=(p+2k)+q$ whenever $p+2k$ is again an
+anchor, so one large prime serves a stretch of consecutive even numbers. For 64
+consecutive even numbers $N_0,\dots,N_0+126$ and a cached $q<N_0$, the partners
+$N_0-q+2i$ are 64 consecutive odd numbers, so a single 64-bit window of the
+anchor bitset certifies all of them at once. No primality test is needed,
+because $q$ is already proven prime. Numbers left uncovered go to a cold path,
+which scans the anchors $p$ in ascending order, discards $q=N-p$ with a prime
+factor up to $37$, and tests the rest with a deterministic seven-base
+Miller--Rabin test valid for all $n<2^{64}$~\cite{Sinclair,FG}. The first $q$
+found is proven prime and enters the ring, and the witness is the least anchor
+partner of $N$. An $N$ with no anchor partner $p\le P$ is escalated to a search
+over starters up to $10^8$ and logged as a miss. The range is cut into blocks of
+$2^{b}$ even numbers ($b=20$ or $24$), each verified independently with a
+freshly cleared ring, so results do not depend on the thread count. With all
+odd primes as anchors, the same program verified the binary Goldbach conjecture
+on $[4\cdot10^{18},4.003\cdot10^{18})$~\cite{QHot2}.
+
+\paragraph{Integrity.}
+The program writes checkpoints containing running totals, sample witnesses
+(one fast-path and one cold-path witness per stretch of length $10^{10}$), and
+every miss record, and it validates them on resume. A separate
+log records the least starter for the first $w$ even $N$ of every stretch of
+length $10^{10}$. Every build is checked by a bit-exact comparison of its
+vectorised prefix against the scalar path, and by forced-miss runs whose miss
+lists must agree between the profile-guided and plain builds. A provenance file
+records compiler flags and SHA-256 hashes of source, binary and profile. Rebuilding
+the Conjecture~\ref{conj:A} verifier from the final published source reproduced the
+campaign binary bit for bit (identical SHA-256), so the published code is exactly the
+code that produced the results. All
+sampled witnesses, and all $9\times10^5$ and $5\times10^5$ logged minimal witnesses of
+the campaigns on $[10^{12},10^{13}]$ (Conjecture~\ref{conj:A}) and $[8,10^{12}]$
+(Conjecture~\ref{conj:B}), were rechecked by independent Python scripts (sympy
+primality), and random subsamples were checked for minimality. For every logged
+$N\equiv 2\pmod 3$ in the first of these, the audit also confirms
+Proposition~\ref{prop:twinblock}: a twin-starter partner exists exactly when $N-3$
+is prime.
+
+\paragraph{Results.} Table~\ref{tab:runs} lists the campaigns. The two
+ranges for Conjecture~\ref{conj:A} meet without gap or overlap.
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{llrrrr}
+\toprule
+Conjecture & Range & Even $N$ & Misses & Time (s) & Rate (M/s)\\
+\midrule
+\ref{conj:A} & $[6,10^{12}]$ & $499{,}999{,}999{,}998$ & $0$ & $994.7$ & $502.7$\\
+\ref{conj:A} & $[10^{12}+2,10^{13}]$ & $4{,}500{,}000{,}000{,}000$ & $0$ & $8662.3$ & $519.5$\\
+\ref{conj:B} & $[8,10^{12}]$ & $499{,}999{,}999{,}997$ & $0$ & $803.2$ & $622.5$\\
+\midrule
+\ref{conj:A} & $[4\cdot10^{18},4\cdot10^{18}+10^8]$ & $5\times10^7$ & $0$ & -- & --\\
+\ref{conj:B} & $[4\cdot10^{18},4\cdot10^{18}+10^8]$ & $5\times10^7$ & $0$ & -- & --\\
+\bottomrule
+\end{tabular}
+\caption{Verification campaigns. The anchor limit was $P=2\cdot10^7$ (block size $2^{24}$) for the
+first row, $P=10^7$ (block size $2^{24}$) for the second, and $P=10^7$ (block size $2^{20}$) for the
+others. The upper three rows ran
+on a laptop with an Intel Core i5-1235U (10 cores, 12 threads) under WSL2,
+compiled with GCC 13.3 (\texttt{-O3 -march=native}, AVX2 prefix); all three
+rows used profile-guided builds (the Conjecture~\ref{conj:B} build with
+\texttt{-DSEXY\_ANCHORS}). An earlier run of Conjecture~\ref{conj:B} with a plain,
+non-profiled build gave identical counters (fast-path hits, cold-path candidates,
+Miller--Rabin calls) to all reported digits, as the block design requires.
+The last two rows are spot windows near the limit of published Goldbach
+verification~\cite{OHP}.}
+\label{tab:runs}
+\end{table}
+
+\section{How small the starter is}\label{sec:fuel}
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{lrrrr}
+\toprule
+& \multicolumn{2}{c}{Conjecture~\ref{conj:A}} & \multicolumn{2}{c}{Conjecture~\ref{conj:B}}\\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}
+$N\bmod 3$ & mean & max & mean & max \\
+\midrule
+$0$ & $105$ & $1{,}783$ & $110$ & $2{,}441$\\
+$1$ & $311$ & $6{,}299$ & $268$ & $6{,}257$\\
+$2$ & $261$ & $6{,}007$ & $332$ & $8{,}641$\\
+\bottomrule
+\end{tabular}
+\caption{Least starter partner $p$ for $2\times10^4$ consecutive even $N$ from
+$4\cdot10^{18}$, by residue class. Under Conjecture~\ref{conj:A}, each blocked
+class is served by one dedicated gap; under Conjecture~\ref{conj:B}, classes $1$
+and $2$ each lose half of the starters (Remark~\ref{rem:halving}). The overall
+means are similar: $226$ (A) and $237$ (B).}
+\label{tab:fuel}
+\end{table}
+
+The least starter stays tiny as $N$ grows. Over the sampled windows, its
+maximum was $4{,}729$ up to $10^{12}$ and $6{,}197$ on $[10^{12},10^{13}]$ for
+Conjecture~\ref{conj:A}, and $4{,}357$ up to $10^{12}$ for Conjecture~\ref{conj:B}.
+Near $4\cdot10^{18}$ it was at most $6{,}299$ and $8{,}641$ respectively.
+
+The two starter sets are of comparable size. Below $10^7$ there are
+$117{,}601$ twin-or-cousin starters and $117{,}207$ sexy starters. This
+agrees with the Hardy--Littlewood prediction~\cite{HL}: sexy pairs are
+asymptotically twice as numerous as twin pairs, and twin and cousin pairs are
+equally numerous and (apart from $p=3$) disjoint as starter sets.
+
+In the data for Conjecture~\ref{conj:B} up to $10^{12}$, the class means are
+unequal: $51$, $122$ and $167$ for $N\equiv 0,1,2\pmod 3$. This is because the smallest
+sexy starters lean towards $p\equiv 2\pmod 3$ ($5,11,17,23$), which favours the
+class $N\equiv1$. Near $4\cdot10^{18}$ the asymmetry between classes $1$ and
+$2$ is smaller. We expect it to be a small-number effect, but we have not
+quantified it.
+
+\section{Open questions}
+\begin{enumerate}
+\item Prove Conjecture~\ref{conj:A} or~\ref{conj:B} for almost all even $N$,
+perhaps conditionally on a Hardy--Littlewood-type hypothesis, in the spirit of
+the conditional density result of~\cite{Pandey}.
+\item Give an asymptotic for the number of starter partitions of $N$ (a
+singular series for the restricted problem), and explain the class-dependent
+costs of Table~\ref{tab:fuel}.
+\item Is the set of exceptions to the single-gap version finite for every
+$g\equiv0\pmod 6$? (For $g=6$ and $g=12$ the only exception up to $10^7$ is
+$N=6$.)
+\item Extend the verification of Conjecture~\ref{conj:A} beyond $10^{13}$ and of
+Conjecture~\ref{conj:B} beyond $10^{12}$.
+\end{enumerate}
+
+\section*{Data and code availability}
+The verifier source, build script, analysis scripts, checkpoint files, minimal-witness
+logs and provenance files are available at \url{https://github.com/psaraj12/goldbach-engine}, in the directory
+\texttt{goldbach-starters/}.
+
+\section*{Acknowledgements}
+% EDIT as you see fit; disclosure of AI assistance is recommended.
+Code review, analysis scripts and drafting of this manuscript were assisted by an
+AI system (Claude, Anthropic). The author designed the conjectures, ran all
+computations and checked every result.
+
+\begin{thebibliography}{99}
+\bibitem{A007534} OEIS Foundation Inc., Sequence A007534, \emph{Positive even
+numbers that are not the sum of a pair of twin primes},
+\url{https://oeis.org/A007534}.
+\bibitem{Davenport} H. Davenport, \emph{Multiplicative Number Theory}, 3rd ed.,
+Graduate Texts in Mathematics 74, Springer, 2000.
+\bibitem{Dubner} H. Dubner, Twin prime conjectures, \emph{J. Recreational Math.}
+\textbf{30} (1999--2000), no.~3.
+\bibitem{Gomez} J. Gómez, On primorial numbers, arXiv:2301.02770.
+\bibitem{HL} G. H. Hardy and J. E. Littlewood, Some problems of `Partitio
+numerorum' III: On the expression of a number as a sum of primes, \emph{Acta
+Math.} \textbf{44} (1923), 1--70.
+\bibitem{OHP} T. Oliveira e Silva, S. Herzog and S. Pardi, Empirical
+verification of the even Goldbach conjecture and computation of prime gaps up to
+$4\cdot10^{18}$, \emph{Math. Comp.} \textbf{83} (2014), 2033--2060.
+\bibitem{Pandey} T. Pandey, An intermediate conjecture between Goldbach and
+Dubner: every even number is the sum of a prime and a twin prime,
+arXiv:2608.02381 (2026).
+\bibitem{Sahu} R. Sahu, On extending Goldbach's conjecture: the patterns of
+isolated and twin primes into the even sums, \emph{Int. Res. J. Eng. Technol.}
+\textbf{11} (2024), no.~10, 62--65.
+\bibitem{Sinclair} J. Sinclair (2011), the seven-base set
+$\{2, 325, 9375, 28178, 450775, 9780504, 1795265022\}$, deterministic for all
+$n<2^{64}$; recorded in W. Izykowski, \emph{Deterministic variants of the
+Miller--Rabin primality test}, \url{https://miller-rabin.appspot.com}.
+\bibitem{FG} J. Feitsma and W. Galway, list of base-2 strong pseudoprimes below
+$2^{64}$, \url{http://www.cecm.sfu.ca/Pseudoprimes/index-2-to-64.html}.
+\bibitem{QHot} S. A. R. Parthibanathan, Q-Hot Cache: a high-throughput method for
+empirical verification of the even Goldbach conjecture, Zenodo preprint, April 2026,
+doi:\href{https://doi.org/10.5281/zenodo.19884541}{10.5281/zenodo.19884541}.
+\bibitem{QHot2} S. A. R. Parthibanathan, Q-Hot Cache: verifying the even Goldbach
+conjecture to $4.003\cdot10^{18}$, submitted to \emph{Experimental Mathematics} (2026); campaign data
+doi:\href{https://doi.org/10.5281/zenodo.23082138}{10.5281/zenodo.23082138}, production audit
+doi:\href{https://doi.org/10.5281/zenodo.23278480}{10.5281/zenodo.23278480}. % CHECK: replace with arXiv/journal ref once posted
+\bibitem{Sun} Z.-W. Sun, Conjectures on representations involving primes, in:
+M. Nathanson (ed.), \emph{Combinatorial and Additive Number Theory II},
+Springer Proc. Math. Stat. \textbf{220}, Springer, New York, 2017, pp.~279--310;
+arXiv:1211.1588.
+\bibitem{Zwillinger} D. Zwillinger, A Goldbach conjecture using twin primes,
+\emph{Math. Comp.} \textbf{33} (1979), 1071,
+doi:\href{https://doi.org/10.1090/S0025-5718-1979-0528060-5}{10.1090/S0025-5718-1979-0528060-5}.
+\end{thebibliography}
+
+\end{document}

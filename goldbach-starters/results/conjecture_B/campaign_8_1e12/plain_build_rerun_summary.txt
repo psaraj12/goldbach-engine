@@ -1,0 +1,20 @@
+# Earlier run of Conjecture B with a plain (non-PGO) -DSEXY_ANCHORS build (Sun 2026-11-22, IST).
+# The run of record is the PGO run (run.log in this directory). All work counters agree exactly,
+# and the minimal-witness data rows of the two runs are byte-identical; only two header
+# comment lines of goldbach_sx_minp.csv differ (a cosmetic fix to the anchor description).
+===== FINAL SUMMARY =====
+Full range:        [8 .. 1000000000000]
+Coverage:          499999999997 / 499999999997
+Misses:            0 (unresolved: 0, anchor-exhausted: 0)
+QHot hit rate:     99.954066%
+QHot probes/N:     2.924694
+Cold cand/N:       0.009512   (anchor primes considered)
+Cold surv/N:       0.002305   (survived trial division)
+MR calls/N:        0.002305   (Miller-Rabin invocations)
+Total time:        905.690345 s
+Throughput:        552.065066 M/s
+Samples:           200
+Minp rows:         500000 (goldbach_sx_minp.csv)
+Checkpoints:       5
+Output:            goldbach_sx_checkpoint.csv
+Miss report:       goldbach_sx_misses.csv

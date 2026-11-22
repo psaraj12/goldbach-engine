@@ -1,0 +1,14 @@
+build/
+gb_build*/
+*.o
+*.gcda
+*.gcno
+goldbach_v6
+goldbach_v6_*
+gs_gen
+paper/*.aux
+paper/*.log
+paper/*.out
+paper/*.fls
+paper/*.fdb_latexmk
+__pycache__/
