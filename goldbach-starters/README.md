@@ -50,6 +50,9 @@ scripts/
   lowside_check.py         low-side form of Conjecture A (p <= N/2) to 1e7
   propagation_steps.py     the +2 / +4 propagation steps to 1e7
   deep_probe_1e18.py       random spot probes at 1e9 .. 1e18
+  crosscheck_pandey_records.py  reproduces the 51 least-witness records of Pandey
+                           (arXiv:2608.02381) and checks that for N = 1 (mod 3) they equal the
+                           least twin/cousin starter (Proposition 9 of the paper)
 paper/
   goldbach_starters.tex / .pdf
 provenance/                compiler, flags, CPU and SHA-256 of source, binary and PGO profile

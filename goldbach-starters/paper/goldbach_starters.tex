@@ -94,9 +94,10 @@ Conjecture~\ref{conj:A} implies there are infinitely many twin or cousin
 prime pairs, and Conjecture~\ref{conj:B} implies infinitely many sexy prime
 pairs. Neither statement is proved.
 
-In every verified case the witness $p$ is tiny compared with $N$: the least
-starter partner never exceeded $6{,}197$ in our sampled windows up to
-$10^{13}$ (Section~\ref{sec:fuel}). In particular the witness is always the
+In every verified case the witness $p$ is tiny compared with $N$. In our sampled
+windows up to $10^{13}$ the least starter partner never exceeded $6{,}197$; exhaustively
+it is larger, at least $20{,}747$ below $10^{13}$ (Section~\ref{sec:fuel}), but still far
+below the anchor limit. In particular the witness is always the
 \emph{smaller} part of the partition for $N>4\cdot 10^7$.
 
 \paragraph{Related work.}
@@ -106,8 +107,10 @@ $n>4208$ is a sum of two twin-prime \emph{members} (OEIS
 A007534~\cite{A007534}). Sahu~\cite{Sahu} and, independently and much more
 extensively, Pandey~\cite{Pandey} studied the intermediate statement that every
 even $n\ge 6$ is $p+t$ with $p$ prime and $t$ a member (lower or upper) of a
-twin pair. Pandey verified it to $10^{14}$ and observed the same mod-3
-``orientation rigidity'' that underlies Section~\ref{sec:mod3}. Gómez~\cite{Gomez}
+twin pair. Pandey verified it to $10^{14}$, observed the same mod-3
+``orientation rigidity'' that underlies Section~\ref{sec:mod3}, proved by Romanov's method
+that it holds for a positive proportion of even numbers under a Hardy--Littlewood-type
+lower bound for twin primes, and modelled the size of the least witness. Gómez~\cite{Gomez}
 proposed weaker twin, cousin and sexy variants (either summand may be either
 member of its pair), checked up to about $6.5\cdot 10^9$. Sun~\cite{Sun}
 formulated many refinements of Goldbach involving prime pairs, including sexy
@@ -411,6 +414,31 @@ The least starter stays tiny as $N$ grows. Over the sampled windows, its
 maximum was $4{,}729$ up to $10^{12}$ and $6{,}197$ on $[10^{12},10^{13}]$ for
 Conjecture~\ref{conj:A}, and $4{,}357$ up to $10^{12}$ for Conjecture~\ref{conj:B}.
 Near $4\cdot10^{18}$ it was at most $6{,}299$ and $8{,}641$ respectively.
+These are maxima over sampled windows only, and they understate the exhaustive maxima,
+because the extreme $N$ are rare. The class $N\equiv 1\pmod 3$ can be compared exactly with
+the exhaustive records of~\cite{Pandey}.
+
+\begin{proposition}\label{prop:samewitness}
+Let $N\equiv 1\pmod 3$ be even. Among partitions $N=p+q$ with $q>3$ prime, $p$ is a twin or
+cousin starter if and only if $p$ is a lower twin member, if and only if $p$ is a twin member.
+Hence the least twin-or-cousin starter partner of $N$ equals the least twin-member partner
+$t_{\min}(N)$ of~\cite{Pandey}, unless one of them equals $N-3$.
+\end{proposition}
+
+\begin{proof}
+A cousin starter $p>3$ has $p\equiv 1\pmod 3$, which would give $3\mid q$; and $3$ is a twin
+starter. An upper twin member $p$ with $q>3$ is $5$ by~\cite[Prop.~3]{Pandey}, and $5$ is
+also a lower member. So all three sets of admissible $p$ coincide.
+\end{proof}
+
+All $21$ of the record values of $t_{\min}$ in~\cite{Pandey} with $N\equiv1\pmod 3$ agree
+with the least twin-or-cousin starter computed independently by us (script
+\texttt{crosscheck\_pandey\_records.py}); those records were confirmed to $10^{13}$ by
+Oliveira e Silva with independent code~\cite{Pandey}. In particular the exhaustive maximum
+of the least starter in Conjecture~\ref{conj:A} is at least $20{,}747$ below $10^{13}$
+(at $N=6{,}527{,}240{,}154{,}856$) and at least $21{,}599$ below $10^{14}$. In the class
+$N\equiv2\pmod3$ the two problems differ sharply: at Pandey's records in that class, which
+need upper twin members, our least starter (a cousin starter) is between $37$ and $937$.
 
 The two starter sets are of comparable size. Below $10^7$ there are
 $117{,}601$ twin-or-cousin starters and $117{,}207$ sexy starters. This
