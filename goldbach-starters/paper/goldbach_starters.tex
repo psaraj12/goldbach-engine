@@ -107,10 +107,11 @@ $n>4208$ is a sum of two twin-prime \emph{members} (OEIS
 A007534~\cite{A007534}). Sahu~\cite{Sahu} and, independently and much more
 extensively, Pandey~\cite{Pandey} studied the intermediate statement that every
 even $n\ge 6$ is $p+t$ with $p$ prime and $t$ a member (lower or upper) of a
-twin pair. Pandey verified it to $10^{14}$, observed the same mod-3
-``orientation rigidity'' that underlies Section~\ref{sec:mod3}, proved by Romanov's method
-that it holds for a positive proportion of even numbers under a Hardy--Littlewood-type
-lower bound for twin primes, and modelled the size of the least witness. Gómez~\cite{Gomez}
+twin pair. Pandey verified it to $10^{14}$; proved the mod-3
+``orientation rigidity'' (his Proposition~3) that underlies Section~\ref{sec:mod3};
+showed by Romanov's method that the statement holds for a positive proportion of even
+numbers under a Hardy--Littlewood-type lower bound for twin primes; and modelled the size
+of the least witness. Gómez~\cite{Gomez}
 proposed weaker twin, cousin and sexy variants (either summand may be either
 member of its pair), checked up to about $6.5\cdot 10^9$. Sun~\cite{Sun}
 formulated many refinements of Goldbach involving prime pairs, including sexy
@@ -437,8 +438,10 @@ with the least twin-or-cousin starter computed independently by us (script
 Oliveira e Silva with independent code~\cite{Pandey}. In particular the exhaustive maximum
 of the least starter in Conjecture~\ref{conj:A} is at least $20{,}747$ below $10^{13}$
 (at $N=6{,}527{,}240{,}154{,}856$) and at least $21{,}599$ below $10^{14}$. In the class
-$N\equiv2\pmod3$ the two problems differ sharply: at Pandey's records in that class, which
-need upper twin members, our least starter (a cousin starter) is between $37$ and $937$.
+$N\equiv2\pmod3$ the two problems differ sharply: at the $14$ of Pandey's records in that
+class with $t_{\min}\ge 3{,}469$, which need upper twin members, our least starter (a cousin
+starter) is between $37$ and $937$. Pandey independently re-checked this comparison
+(private communication, November 2026).
 
 The two starter sets are of comparable size. Below $10^7$ there are
 $117{,}601$ twin-or-cousin starters and $117{,}207$ sexy starters. This
@@ -475,6 +478,8 @@ logs and provenance files are available at \url{https://github.com/psaraj12/gold
 
 \section*{Acknowledgements}
 % EDIT as you see fit; disclosure of AI assistance is recommended.
+The author thanks Tushar Pandey for independently re-checking the comparison with his
+records in Section~\ref{sec:fuel} and for a correction to the description of his work.
 Code review, analysis scripts and drafting of this manuscript were assisted by an
 AI system (Claude, Anthropic). The author designed the conjectures, ran all
 computations and checked every result.
