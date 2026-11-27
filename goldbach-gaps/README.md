@@ -20,6 +20,11 @@ three questions:
    (30, 210, 2310, ...) have more starters, but each one is less likely to be
    prime-paired at small sizes. The best gap depends on how far the starters reach.
 
+## Results
+
+See [RESULTS.md](RESULTS.md): census of 100 gaps, and two pre-registered window
+experiments (Round 1: two of four criteria failed; Round 2: all five hypotheses supported).
+
 ## Contents
 
 | Path | What it is |
@@ -29,7 +34,7 @@ three questions:
 | `prereg/` | **Pre-registered** window experiment: frozen predictions of four candidate growth laws (`predictions.csv`), the hypotheses and pass/fail criteria (`PREREG.md`), the script that wrote them (`prereg_windows.py`), and the script that runs every window (`run_grid.sh`). |
 | `runs/` | Round 1 results: one `minpstats` row per window (420 windows) and the engine log of each run. |
 | `prereg_r2/` | **Round 2 pre-registration**: laws with the worst-N residue correction F(g), calibrated on Round 1 and frozen (`PREREG_R2.md`, `predictions_r2.csv`), the script (`prereg_r2.py`, which also scores the mechanism tests H4 and H5) and the runner (`run_grid_r2.sh`). |
-| `runs_r2/` | Round 2 results (created by `run_grid_r2.sh`). |
+| `runs_r2/` | Round 2 results: one `minpstats` row per window (560 windows) and the engine log of each run. |
 
 **Not here:** the campaign source of the arXiv starter paper. It lives unchanged in
 `../goldbach-starters/` and must stay byte-identical there, because the paper
